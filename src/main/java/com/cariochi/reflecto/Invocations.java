@@ -32,7 +32,7 @@ public class Invocations {
         return new Invocations(invocations);
     }
 
-    public Reflection applyAll(Object instance) {
+    public Reflection apply(Object instance) {
         final Iterator<Invocation> iterator = invocations.iterator();
         Reflection reflection = reflect(instance);
         while (iterator.hasNext()) {

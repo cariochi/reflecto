@@ -20,8 +20,8 @@
     "Component": "Authorization"
   },
   "tags": [
-    "getRoles",
-    "getUser",
+    "roles",
+    "user",
     "auth"
   ]
 }

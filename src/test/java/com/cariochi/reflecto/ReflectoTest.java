@@ -38,8 +38,8 @@ class ReflectoTest {
     @Test
     void should_get_field_of_array(@Read("/bug.json") Bug bug) {
         final Reflection ref = reflect(bug);
-        assertValueEquals(ref.get("tags[1]"), "getUser");
-        assertValueEquals(ref.get("getTags()[1]"), "getUser");
+        assertValueEquals(ref.get("tags[1]"), "user");
+        assertValueEquals(ref.get("getTags()[1]"), "user");
     }
 
     @Test
@@ -61,7 +61,7 @@ class ReflectoTest {
         ref.invoke("watchers.get(?).username=?", 0, "java-dev");
         ref.get("watchers.get(?).id", 1).setValue(1002);
         ref.get("watchers.get(?).username", 1).setValue("pm");
-        ref.get("tags[0]").setValue("getRoles");
+        ref.get("tags[0]").setValue("roles");
         ref.get("details[Sprint]").setValue("RFT-234");
         assertAsJson(bug).isEqualTo("/modified_bug.json");
     }
@@ -74,7 +74,7 @@ class ReflectoTest {
         ref.get("getWatchers().get(?)", 0).methods().get("setUsername(?)", String.class).invoke("java-dev");
         ref.invoke("getWatchers().remove(?)", 1);
         ref.invoke("getWatchers().add(?)", new User(1002, "pm"));
-        ref.invoke("tags[0]=?", "getRoles");
+        ref.invoke("tags[0]=?", "roles");
         ref.invoke("getDetails().put(?,?)", "Sprint", "RFT-234");
         assertAsJson(bug).isEqualTo("/modified_bug.json");
     }

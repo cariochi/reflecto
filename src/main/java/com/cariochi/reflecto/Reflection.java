@@ -10,7 +10,7 @@ public interface Reflection {
     <V> void setValue(V value);
 
     default Reflection get(String path, Object... args) {
-        return Invocations.parse(path, args).applyAll(getValue());
+        return Invocations.parse(path, args).apply(getValue());
     }
 
     default <V> V invoke(String path, Object... args) {
