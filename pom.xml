@@ -46,7 +46,7 @@
 <!--        <commons-lang3.version>3.12.0</commons-lang3.version>-->
         <commons-lang3.version>3.11</commons-lang3.version>
 
-        <junit-jupiter.version>5.6.2</junit-jupiter.version>
+        <recordo.version>1.1.10</recordo.version>
         <assertj.version>3.19.0</assertj.version>
     </properties>
 
@@ -66,9 +66,9 @@
         </dependency>
 
         <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <version>${junit-jupiter.version}</version>
+            <groupId>com.cariochi</groupId>
+            <artifactId>recordo</artifactId>
+            <version>${recordo.version}</version>
             <scope>test</scope>
         </dependency>
 

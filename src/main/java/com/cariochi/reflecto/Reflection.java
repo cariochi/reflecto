@@ -1,7 +1,7 @@
 package com.cariochi.reflecto;
 
-import com.cariochi.reflecto.fields.JavaField;
-import com.cariochi.reflecto.methods.JavaMethod;
+import com.cariochi.reflecto.fields.Fields;
+import com.cariochi.reflecto.methods.Methods;
 
 public interface Reflection {
 
@@ -10,11 +10,7 @@ public interface Reflection {
     <V> void setValue(V value);
 
     default Reflection get(String path, Object... args) {
-        return Reflecto.reflect(getValue()).get(path, args);
-    }
-
-    default JavaField field(String path, Object... args) {
-        return (JavaField) get(path, args);
+        return Invocations.parse(path, args).applyAll(getValue());
     }
 
     default <V> V invoke(String path, Object... args) {
@@ -27,10 +23,6 @@ public interface Reflection {
 
     default Methods methods() {
         return new Methods(getValue());
-    }
-
-    default JavaMethod method(String name, Class<?>... argClasses) {
-        return methods().get(name, argClasses);
     }
 
 }

@@ -1,0 +1,27 @@
+{
+  "id": 1,
+  "summary": "Modified bug",
+  "reporter": {
+    "id": 100,
+    "username": "qa"
+  },
+  "watchers": [
+    {
+      "id": 1001,
+      "username": "java-dev"
+    },
+    {
+      "id": 1002,
+      "username": "pm"
+    }
+  ],
+  "details": {
+    "Sprint": "RFT-234",
+    "Component": "Authorization"
+  },
+  "tags": [
+    "getRoles",
+    "getUser",
+    "auth"
+  ]
+}

@@ -1,6 +1,5 @@
-package com.cariochi.reflecto;
+package com.cariochi.reflecto.methods;
 
-import com.cariochi.reflecto.methods.JavaMethod;
 import lombok.RequiredArgsConstructor;
 
 import java.lang.annotation.Annotation;

@@ -1,0 +1,27 @@
+{
+  "id": 1,
+  "summary": "Invalid value",
+  "reporter": {
+    "id": 100,
+    "username": "qa"
+  },
+  "watchers": [
+    {
+      "id": 101,
+      "username": "developer"
+    },
+    {
+      "id": 102,
+      "username": "manager"
+    }
+  ],
+  "details": {
+    "Sprint": "RFT-233",
+    "Component": "Authorization"
+  },
+  "tags": [
+    "getRole",
+    "getUser",
+    "auth"
+  ]
+}

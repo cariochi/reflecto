@@ -1,4 +1,4 @@
-package com.cariochi.reflecto.dto;
+package com.cariochi.reflecto.model;
 
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
@@ -11,5 +11,5 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({METHOD, FIELD})
 @Retention(RUNTIME)
 @Inherited
-public @interface TestAnnotation {
+public @interface Id {
 }

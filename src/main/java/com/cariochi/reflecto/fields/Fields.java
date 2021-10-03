@@ -1,6 +1,5 @@
-package com.cariochi.reflecto;
+package com.cariochi.reflecto.fields;
 
-import com.cariochi.reflecto.fields.JavaField;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.reflect.FieldUtils;
 

@@ -1,5 +1,7 @@
 package com.cariochi.reflecto.methods;
 
+import com.cariochi.reflecto.Reflection;
+import com.cariochi.reflecto.Reflecto;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.reflect.MethodUtils;
@@ -22,9 +24,9 @@ public class JavaMethod {
     }
 
     @SneakyThrows
-    public InvocationResult invoke(Object... args) {
+    public Reflection invoke(Object... args) {
         method.setAccessible(true);
-        return new InvocationResult(method.invoke(instance, args));
+        return Reflecto.reflect(method.invoke(instance, args));
     }
 
     public <A extends Annotation> Optional<A> findAnnotation(Class<A> annotationCls) {
