@@ -56,8 +56,8 @@ class ReflectoTest {
     @Test
     void should_set_field_value(@Read("/bug.json") Bug bug) {
         final Reflection ref = reflect(bug);
-        ref.get("summary").setValue("Modified bug");
-        ref.get("watchers[0].id").setValue(1001);
+        ref.invoke("summary=?", "Modified bug");
+        ref.get("watchers[0].id=?", 1001);
         ref.invoke("watchers.get(?).username=?", 0, "java-dev");
         ref.get("watchers.get(?).id", 1).setValue(1002);
         ref.get("watchers.get(?).username", 1).setValue("pm");
