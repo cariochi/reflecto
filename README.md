@@ -1,2 +1,2 @@
-# com.cariochi.recordo.utils.reflecto
+# Reflecto
 Java Reflection Library
