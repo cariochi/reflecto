@@ -1,2 +1,2 @@
 # Reflecto
-Java Reflection Library
+Java Deep Reflection Library
