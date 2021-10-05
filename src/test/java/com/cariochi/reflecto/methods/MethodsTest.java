@@ -2,6 +2,7 @@ package com.cariochi.reflecto.methods;
 
 import com.cariochi.recordo.Read;
 import com.cariochi.recordo.RecordoExtension;
+import com.cariochi.reflecto.Reflection;
 import com.cariochi.reflecto.model.Bug;
 import com.cariochi.reflecto.model.Id;
 import org.junit.jupiter.api.Test;
@@ -40,5 +41,13 @@ class MethodsTest {
                 .containsExactly(tuple("getId", Integer.class));
     }
 
+    @Test
+    void should_invoke(@Read("/bug.json") Bug bug) {
+        final Reflection reflection = reflect(bug);
+        assertThat(reflection.<String>invoke("reporter.sayHello(?)", "Vadym"))
+                .isEqualTo("Hello Vadym from qa");
+        assertThat(reflection.get("getReporter()").methods().get("sayHello(?)", String.class).<String>invoke("Vadym"))
+                .isEqualTo("Hello Vadym from qa");
+    }
 
 }

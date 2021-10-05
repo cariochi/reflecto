@@ -1,11 +1,19 @@
 package com.cariochi.reflecto.model;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+import lombok.extern.jackson.Jacksonized;
 
 import java.util.List;
 import java.util.Map;
 
-@Data
+import static lombok.AccessLevel.PRIVATE;
+
+@Getter
+@Setter(PRIVATE)
+@SuperBuilder
+@Jacksonized
 public class Issue {
 
     @Id

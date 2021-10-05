@@ -45,12 +45,12 @@ class ReflectoTest {
     @Test
     void should_get_field_of_map(@Read("/bug.json") Bug bug) {
         final Reflection ref = reflect(bug);
-        assertValueEquals(ref.get("details[Sprint]"), "RFT-233");
-        assertValueEquals(ref.get("getDetails()[Sprint]"), "RFT-233");
-        assertValueEquals(ref.get("details.get(?)", "Sprint"), "RFT-233");
-        assertValueEquals(ref.get("getDetails().get(?)", "Sprint"), "RFT-233");
-        assertValueEquals(ref.get("details").get("[Sprint]"), "RFT-233");
-        assertValueEquals(ref.get("getDetails()").get("get(?)", "Sprint"), "RFT-233");
+        assertValueEquals(ref.get("details[Sprint]"), "SPR-001");
+        assertValueEquals(ref.get("getDetails()[Sprint]"), "SPR-001");
+        assertValueEquals(ref.get("details.get(?)", "Sprint"), "SPR-001");
+        assertValueEquals(ref.get("getDetails().get(?)", "Sprint"), "SPR-001");
+        assertValueEquals(ref.get("details").get("[Sprint]"), "SPR-001");
+        assertValueEquals(ref.get("getDetails()").get("get(?)", "Sprint"), "SPR-001");
     }
 
     @Test
@@ -62,7 +62,7 @@ class ReflectoTest {
         ref.get("watchers.get(?).id", 1).setValue(1002);
         ref.get("watchers.get(?).username", 1).setValue("pm");
         ref.get("tags[0]").setValue("roles");
-        ref.get("details[Sprint]").setValue("RFT-234");
+        ref.get("details[Sprint]").setValue("SPR-002");
         assertAsJson(bug).isEqualTo("/modified_bug.json");
     }
 
@@ -75,7 +75,7 @@ class ReflectoTest {
         ref.invoke("getWatchers().remove(?)", 1);
         ref.invoke("getWatchers().add(?)", new User(1002, "pm"));
         ref.invoke("tags[0]=?", "roles");
-        ref.invoke("getDetails().put(?,?)", "Sprint", "RFT-234");
+        ref.invoke("getDetails().put(?,?)", "Sprint", "SPR-002");
         assertAsJson(bug).isEqualTo("/modified_bug.json");
     }
 

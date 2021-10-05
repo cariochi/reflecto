@@ -9,7 +9,7 @@ import java.util.Map;
 public class MapField implements Reflection {
 
     private final Map<Object, Object> target;
-    private final String key;
+    private final Object key;
 
     public <V> V getValue() {
         return (V) target.get(key);

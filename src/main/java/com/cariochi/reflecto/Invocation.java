@@ -9,6 +9,7 @@ import com.cariochi.reflecto.methods.JavaMethod;
 import java.util.List;
 import java.util.Map;
 
+import static com.cariochi.reflecto.Reflecto.reflect;
 import static java.lang.Integer.parseInt;
 import static org.apache.commons.lang3.ClassUtils.toClass;
 import static org.apache.commons.lang3.StringUtils.substringBefore;
@@ -28,11 +29,11 @@ public class Invocation {
 
     public Reflection apply(Object instance) {
         if (isMethod) {
-            return getMethod(instance).invoke(args);
+            return reflect(getMethod(instance).invoke(args));
         } else {
             final Reflection field = getField(instance);
-            if (args.length == 1) {
-                field.setValue(args[0]);
+            if (args.length > 0) {
+                field.setValue(args[args.length - 1]);
             }
             return field;
         }
@@ -44,11 +45,14 @@ public class Invocation {
 
     private Reflection getField(Object instance) {
         if (name.startsWith("[")) {
-            final String key = substringBetween(name, "[", "]");
+            Object key = substringBetween(name, "[", "]");
+            if ("?".equals(key)) {
+                key = args[0];
+            }
             if (instance.getClass().isArray()) {
-                return new ArrayField((Object[]) instance, parseInt(key));
+                return new ArrayField((Object[]) instance, parseInt(key.toString()));
             } else if (instance instanceof List) {
-                return new ListField((List<Object>) instance, parseInt(key));
+                return new ListField((List<Object>) instance, parseInt(key.toString()));
             } else if (instance instanceof Map) {
                 return new MapField((Map<Object, Object>) instance, key);
             } else {

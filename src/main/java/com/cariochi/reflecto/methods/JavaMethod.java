@@ -1,16 +1,14 @@
 package com.cariochi.reflecto.methods;
 
-import com.cariochi.reflecto.Reflection;
-import com.cariochi.reflecto.Reflecto;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import org.apache.commons.lang3.reflect.MethodUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Optional;
 
 import static org.apache.commons.lang3.reflect.MethodUtils.getAnnotation;
+import static org.apache.commons.lang3.reflect.MethodUtils.getMatchingMethod;
 
 @RequiredArgsConstructor
 public class JavaMethod {
@@ -20,19 +18,18 @@ public class JavaMethod {
 
     public JavaMethod(Object instance, String name, Class<?>... argClasses) {
         this.instance = instance;
-        this.method = MethodUtils.getMatchingMethod(instance.getClass(), name, argClasses);
+        this.method = getMatchingMethod(instance.getClass(), name, argClasses);
     }
 
     @SneakyThrows
-    public Reflection invoke(Object... args) {
+    public <V> V invoke(Object... args) {
         method.setAccessible(true);
-        return Reflecto.reflect(method.invoke(instance, args));
+        return (V) method.invoke(instance, args);
     }
 
     public <A extends Annotation> Optional<A> findAnnotation(Class<A> annotationCls) {
         return Optional.ofNullable(getAnnotation(method, annotationCls, true, true));
     }
-
 
     public String getName() {
         return method.getName();
