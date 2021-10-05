@@ -6,16 +6,16 @@ Java Deep Reflection Library
 
 ```java
 Bug bug = Bug.builder()
-            .reporter(new User("user1"))
-            .watchers(List.of(
+        .reporter(new User("user1"))
+        .watchers(List.of(
                 new User("user2"),
                 new User("user3")
-            ))
-            .details(Map.of(
+        ))
+        .details(Map.of(
                 "Sprint",new Details("SPR-001"),
                 "Component",new Details("Authorization")
-            ))
-            .build();
+        ))
+        .build();
 ```
 
 ## Fields Reflection
@@ -26,26 +26,26 @@ Bug bug = Bug.builder()
 
 ```java
 String username = reflect(bug)
-                    .get("reporter.username")
-                    .getValue();
+        .get("reporter.username")
+        .getValue();
 ```
 
 ```java
 String username = reflect(bug)
-                    .invoke("reporter.username");
+        .invoke("reporter.username");
 ```
 
 #### Set Value
 
 ```java
 reflect(bug)
-    .get("reporter.username")
-    .setValue("new_name");
+        .get("reporter.username")
+        .setValue("new_name");
 ```
 
 ```java
 reflect(bug)
-    .invoke("reporter.username=?","new_name");
+        .invoke("reporter.username=?","new_name");
 ```
 
 ### List / Array
@@ -54,31 +54,31 @@ reflect(bug)
 
 ```java
 String username = reflect(bug)
-                    .get("watchers[0].username")
-                    .getValue();
+        .get("watchers[0].username")
+        .getValue();
 ```
 
 ```java
 String username = reflect(bug)
-                    .invoke("watchers[0].username");
+        .invoke("watchers[0].username");
 ```
 
 #### Set Value
 
 ```java
 reflect(bug)
-    .get("watchers[0]")
-    .setValue(new User("user4"));
+        .get("watchers[0]")
+        .setValue(new User("user4"));
 ```
 
 ```java
 reflect(bug)
-    .invoke("watchers[0]=?", new User("user4"));
+        .invoke("watchers[0]=?", new User("user4"));
 ```
 
 ```java
 reflect(bug)
-    .invoke("watchers[?]=?", 0, new User("user4"));
+        .invoke("watchers[?]=?", 0, new User("user4"));
 ```
 
 ### Map
@@ -87,73 +87,77 @@ reflect(bug)
 
 ```java
 String sprint = reflect(bug)
-                    .get("details[Sprint].text")
-                    .getValue();
+        .get("details[Sprint].text")
+        .getValue();
 ```
 
 ```java
 String sprint = reflect(bug)
-                    .invoke("details[Sprint].text");
+        .invoke("details[Sprint].text");
 ```
 
 #### Set Value
 
 ```java
 reflect(bug)
-    .get("details[Sprint]")
-    .setValue(new Details("SPR-002"));
+        .get("details[Sprint]")
+        .setValue(new Details("SPR-002"));
 ```
 
 ```java
 reflect(bug)
-    .invoke("details[Sprint]=?", new Details("SPR-002"));
+        .invoke("details[Sprint]=?", new Details("SPR-002"));
 ```
 
 ```java
 reflect(bug)
-    .invoke("details[?]=?", "Sprint", new Details("SPR-002"));
+        .invoke("details[?]=?", "Sprint", new Details("SPR-002"));
 ```
 
 ## Methods Reflection
 
 ```java
 String username = reflect(bug)
-                    .get("getWatchers().get(?).getUsername()", 0)
-                    .getValue();
+        .get("getWatchers().get(?).getUsername()", 0)
+        .getValue();
 ```
 
 ```java
 String username = reflect(bug)
-                    .invoke("getWatchers().get(?).getUsername()", 0);
+        .invoke("getWatchers().get(?).getUsername()", 0);
 ```
 
 ```java
 reflect(bug)
-    .invoke("getWatchers().get(?).setUsername(?)", 0, "new_name");
+        .invoke("getWatchers().get(?).setUsername(?)", 0, "new_name");
+```
+```java
+reflect(bug)
+        .invoke("getDetails().remove(?)", "Sprint");
 ```
 
 ```java
 reflect(bug)
-    .invoke("getDetails().put(?, ?)", "Sprint", new Details("SPR-002"));
+        .invoke("getDetails().put(?, ?)", "Sprint", new Details("SPR-002"));
 ```
 
 ## Mixed Reflection
 
 ```java
 String username = reflect(bug)
-                    .get("watchers[0].getUsername()")
-                    .getValue();
+        .get("watchers[0].getUsername()")
+        .getValue();
 ```
 ```java
 String username = reflect(bug)
-                    .get("getWatchers()[0].getUsername()")
-                    .getValue();
+        .get("getWatchers()[0].getUsername()")
+        .getValue();
 ```
 ```java
 reflect(bug)
-    .invoke("getWatchers().get(?).username=?", 0, "new_name");
+        .invoke("getWatchers().get(?).username=?", 0, "new_name");
 ```
 ```java
 reflect(bug)
-    .invoke("details[Sprint].setText(?)", "SPR-002");
+        .invoke("details[Sprint].setText(?)", "SPR-002");
 ```

@@ -62,7 +62,7 @@ class ReflectoTest {
         ref.get("watchers.get(?).id", 1).setValue(1002);
         ref.get("watchers.get(?).username", 1).setValue("pm");
         ref.get("tags[0]").setValue("roles");
-        ref.get("details[Sprint]").setValue("SPR-002");
+        ref.get("details[?]", "Sprint").setValue("SPR-002");
         assertAsJson(bug).isEqualTo("/modified_bug.json");
     }
 
@@ -74,7 +74,8 @@ class ReflectoTest {
         ref.get("getWatchers().get(?)", 0).methods().get("setUsername(?)", String.class).invoke("java-dev");
         ref.invoke("getWatchers().remove(?)", 1);
         ref.invoke("getWatchers().add(?)", new User(1002, "pm"));
-        ref.invoke("tags[0]=?", "roles");
+        ref.invoke("tags[?]=?", 0, "roles");
+        ref.invoke("getDetails().remove(?)", "Sprint");
         ref.invoke("getDetails().put(?,?)", "Sprint", "SPR-002");
         assertAsJson(bug).isEqualTo("/modified_bug.json");
     }
