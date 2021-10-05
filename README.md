@@ -12,7 +12,7 @@ Bug bug = Bug.builder()
                 new User("user3")
             ))
             .details(Map.of(
-                "Spring",new Details("SPR-001"),
+                "Sprint",new Details("SPR-001"),
                 "Component",new Details("Authorization")
             ))
             .build();
@@ -144,12 +144,16 @@ String username = reflect(bug)
                     .get("watchers[0].getUsername()")
                     .getValue();
 ```
-
+```java
+String username = reflect(bug)
+                    .get("getWatchers()[0].getUsername()")
+                    .getValue();
+```
 ```java
 reflect(bug)
     .invoke("getWatchers().get(?).username=?", 0, "new_name");
 ```
 ```java
 reflect(bug)
-    .invoke("details[Spring].setText(?)", "SPR-002");
+    .invoke("details[Sprint].setText(?)", "SPR-002");
 ```
