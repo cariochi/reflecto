@@ -7,15 +7,15 @@
 
     <groupId>com.cariochi</groupId>
     <artifactId>reflecto</artifactId>
-    <version>1.0</version>
+    <version>1.0.1</version>
     <name>Reflecto</name>
-    <description>JUnit 5 extension for declarative testing.</description>
+    <description>Java Deep Reflection Library</description>
     <url>https://cariochi.com</url>
 
     <licenses>
         <license>
             <name>The MIT License</name>
-            <url>https://github.com/mockito/mockito/blob/master/LICENSE</url>
+            <url>https://github.com/cariochi/reflecto/blob/main/LICENSE</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
@@ -43,7 +43,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <lombok.version>1.18.20</lombok.version>
-<!--        <commons-lang3.version>3.12.0</commons-lang3.version>-->
         <commons-lang3.version>3.11</commons-lang3.version>
 
         <recordo.version>1.1.10</recordo.version>
