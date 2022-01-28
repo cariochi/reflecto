@@ -177,3 +177,6 @@ reflect(bug)
 reflect(bug)
         .invoke("details[Sprint].setText(?)", "SPR-002");
 ```
+# License
+
+**Reflecto** library is licensed under the [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0). 
