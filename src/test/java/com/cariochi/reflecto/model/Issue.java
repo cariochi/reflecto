@@ -1,7 +1,9 @@
 package com.cariochi.reflecto.model;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.jackson.Jacksonized;
 
@@ -10,6 +12,8 @@ import java.util.Map;
 
 import static lombok.AccessLevel.PRIVATE;
 
+@EqualsAndHashCode
+@ToString
 @Getter
 @Setter(PRIVATE)
 @SuperBuilder

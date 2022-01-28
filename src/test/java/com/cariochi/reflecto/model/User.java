@@ -5,6 +5,8 @@ import lombok.extern.jackson.Jacksonized;
 
 import static lombok.AccessLevel.PRIVATE;
 
+@EqualsAndHashCode
+@ToString
 @Getter
 @Setter(PRIVATE)
 @Builder

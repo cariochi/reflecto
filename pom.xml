@@ -5,17 +5,17 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.cariochi</groupId>
+    <groupId>com.cariochi.reflecto</groupId>
     <artifactId>reflecto</artifactId>
-    <version>1.0.1</version>
+    <version>1.1.0</version>
     <name>Reflecto</name>
     <description>Java Deep Reflection Library</description>
-    <url>https://cariochi.com</url>
+    <url>https://cariochi.com/reflecto</url>
 
     <licenses>
         <license>
-            <name>The MIT License</name>
-            <url>https://github.com/cariochi/reflecto/blob/main/LICENSE</url>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
@@ -29,7 +29,7 @@
     <developers>
         <developer>
             <name>Vadym Deineka</name>
-            <email>vadim@deineka.com</email>
+            <email>vadym@deineka.com</email>
             <organization>cariochi.com</organization>
             <organizationUrl>https://cariochi.com</organizationUrl>
         </developer>
@@ -42,11 +42,10 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <lombok.version>1.18.20</lombok.version>
+        <lombok.version>1.18.22</lombok.version>
         <commons-lang3.version>3.11</commons-lang3.version>
 
-        <recordo.version>1.1.10</recordo.version>
-        <assertj.version>3.19.0</assertj.version>
+        <assertj.version>3.22.0</assertj.version>
     </properties>
 
     <dependencies>
@@ -62,13 +61,6 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>${commons-lang3.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.cariochi</groupId>
-            <artifactId>recordo</artifactId>
-            <version>${recordo.version}</version>
-            <scope>test</scope>
         </dependency>
 
         <dependency>

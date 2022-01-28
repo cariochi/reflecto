@@ -1,23 +1,20 @@
 package com.cariochi.reflecto;
 
-import com.cariochi.recordo.Read;
-import com.cariochi.recordo.RecordoExtension;
 import com.cariochi.reflecto.fields.JavaField;
 import com.cariochi.reflecto.model.Bug;
 import com.cariochi.reflecto.model.User;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
-import static com.cariochi.recordo.assertions.JsonAssertion.assertAsJson;
 import static com.cariochi.reflecto.Reflecto.reflect;
+import static com.cariochi.reflecto.TestData.bug;
+import static com.cariochi.reflecto.TestData.modifiedBug;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@ExtendWith(RecordoExtension.class)
 class ReflectoTest {
 
     @Test
-    void should_get_field_value(@Read("/bug.json") Bug bug) {
-        final Reflection ref = reflect(bug);
+    void should_get_field_value() {
+        final Reflection ref = reflect(bug());
         assertValueEquals(ref.get("reporter.id"), 100);
         assertValueEquals(ref.get("getReporter().getId()"), 100);
         assertValueEquals(ref.get("reporter.username"), "qa");
@@ -25,8 +22,8 @@ class ReflectoTest {
     }
 
     @Test
-    void should_get_field_of_list(@Read("/bug.json") Bug bug) {
-        final Reflection ref = reflect(bug);
+    void should_get_field_of_list() {
+        final Reflection ref = reflect(bug());
         assertValueEquals(ref.get("watchers[1].username"), "manager");
         assertValueEquals(ref.get("getWatchers()[1].username"), "manager");
         assertValueEquals(ref.get("watchers.get(?).username", 1), "manager");
@@ -36,15 +33,15 @@ class ReflectoTest {
     }
 
     @Test
-    void should_get_field_of_array(@Read("/bug.json") Bug bug) {
-        final Reflection ref = reflect(bug);
+    void should_get_field_of_array() {
+        final Reflection ref = reflect(bug());
         assertValueEquals(ref.get("tags[1]"), "user");
         assertValueEquals(ref.get("getTags()[1]"), "user");
     }
 
     @Test
-    void should_get_field_of_map(@Read("/bug.json") Bug bug) {
-        final Reflection ref = reflect(bug);
+    void should_get_field_of_map() {
+        final Reflection ref = reflect(bug());
         assertValueEquals(ref.get("details[Sprint]"), "SPR-001");
         assertValueEquals(ref.get("getDetails()[Sprint]"), "SPR-001");
         assertValueEquals(ref.get("details.get(?)", "Sprint"), "SPR-001");
@@ -54,7 +51,8 @@ class ReflectoTest {
     }
 
     @Test
-    void should_set_field_value(@Read("/bug.json") Bug bug) {
+    void should_set_field_value() {
+        final Bug bug = bug();
         final Reflection ref = reflect(bug);
         ref.invoke("summary=?", "Modified bug");
         ref.invoke("watchers[0].id=?", 1001);
@@ -63,11 +61,12 @@ class ReflectoTest {
         ref.get("watchers.get(?).username", 1).setValue("pm");
         ref.get("tags[0]").setValue("roles");
         ref.get("details[?]", "Sprint").setValue("SPR-002");
-        assertAsJson(bug).isEqualTo("/modified_bug.json");
+        assertThat(bug).isEqualTo(modifiedBug());
     }
 
     @Test
-    void should_invoke_method(@Read("/bug.json") Bug bug) {
+    void should_invoke_method() {
+        final Bug bug = bug();
         final Reflection ref = reflect(bug);
         ref.invoke("setSummary(?)", "Modified bug");
         ref.invoke("getWatchers().get(?).setId(?)", 0, 1001);
@@ -77,12 +76,12 @@ class ReflectoTest {
         ref.invoke("tags[?]=?", 0, "roles");
         ref.invoke("getDetails().remove(?)", "Sprint");
         ref.invoke("getDetails().put(?,?)", "Sprint", "SPR-002");
-        assertAsJson(bug).isEqualTo("/modified_bug.json");
+        assertThat(bug).isEqualTo(modifiedBug());
     }
 
     @Test
-    void should_get_java_field(@Read("/bug.json") Bug bug) {
-        final JavaField loadFactor = reflect(bug).get("details").fields().get("loadFactor");
+    void should_get_java_field() {
+        final JavaField loadFactor = reflect(bug()).get("details").fields().get("loadFactor");
         assertThat(loadFactor.getType()).isEqualTo(float.class);
         assertThat((float) loadFactor.getValue()).isEqualTo(0.75f);
     }
