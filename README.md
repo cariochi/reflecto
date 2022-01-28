@@ -2,7 +2,23 @@
 
 Java Deep Reflection Library
 
+# Documentation
+
+Please, see the recently published documentation [here](https://www.cariochi.com/reflecto). 
+
+## Maven dependency
+
+```markup
+<dependency>
+    <groupId>com.cariochi.reflecto</groupId>
+    <artifactId>reflecto</artifactId>
+    <version>1.1.0</version>
+</dependency>
+```
+
 ## Example
+
+Example object:
 
 ```java
 Bug bug = Bug.builder()
