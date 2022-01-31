@@ -15,14 +15,18 @@ class MethodsTest {
 
     @Test
     void should_get_method() {
-        final JavaMethod method = reflect(bug())
-                .get("getWatchers().get(?)", 0)
-                .methods()
-                .get("setUsername(?)", String.class);
+        final Reflection reflection = reflect(bug());
+        final List<JavaMethod> methods = List.of(
+                reflection.get("getWatchers()").get("get(?)", 0).methods().method("setUsername(?)", String.class),
+                reflection.get("getWatchers()").get("get(?)", 0).method("setUsername(?)", String.class),
 
-        assertThat(method)
+                reflection.get("getWatchers().get(?)", 0).methods().method("setUsername(?)", String.class),
+                reflection.get("getWatchers().get(?)", 0).method("setUsername(?)", String.class)
+        );
+
+        assertThat(methods)
                 .extracting(JavaMethod::getName, JavaMethod::getReturnType)
-                .containsExactly("setUsername", void.class);
+                .containsOnly(tuple("setUsername", void.class));
     }
 
     @Test
@@ -42,7 +46,7 @@ class MethodsTest {
         final Reflection reflection = reflect(bug());
         assertThat(reflection.<String>invoke("reporter.sayHello(?)", "Vadym"))
                 .isEqualTo("Hello Vadym from qa");
-        assertThat(reflection.get("getReporter()").methods().get("sayHello(?)", String.class).<String>invoke("Vadym"))
+        assertThat(reflection.get("getReporter()").methods().method("sayHello(?)", String.class).<String>invoke("Vadym"))
                 .isEqualTo("Hello Vadym from qa");
     }
 

@@ -6,8 +6,10 @@ import com.cariochi.reflecto.fields.ListField;
 import com.cariochi.reflecto.fields.MapField;
 import com.cariochi.reflecto.methods.JavaMethod;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 
 import static com.cariochi.reflecto.Reflecto.reflect;
 import static java.lang.Integer.parseInt;
@@ -31,9 +33,10 @@ public class Invocation {
         if (isMethod) {
             return reflect(getMethod(instance).invoke(args));
         } else {
-            final Reflection field = getField(instance);
-            if (args.length > 0) {
-                field.setValue(args[args.length - 1]);
+            Queue<Object> argsQueue = new LinkedList<>(List.of(args));
+            final Reflection field = getField(instance, argsQueue);
+            if (!argsQueue.isEmpty()) {
+                field.setValue(argsQueue.poll());
             }
             return field;
         }
@@ -43,11 +46,11 @@ public class Invocation {
         return new JavaMethod(instance, name, toClass(args));
     }
 
-    private Reflection getField(Object instance) {
+    private Reflection getField(Object instance, Queue<Object> argsQueue) {
         if (name.startsWith("[")) {
             Object key = substringBetween(name, "[", "]");
             if ("?".equals(key)) {
-                key = args[0];
+                key = argsQueue.poll();
             }
             if (instance.getClass().isArray()) {
                 return new ArrayField((Object[]) instance, parseInt(key.toString()));

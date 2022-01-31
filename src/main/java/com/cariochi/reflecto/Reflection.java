@@ -1,6 +1,8 @@
 package com.cariochi.reflecto;
 
 import com.cariochi.reflecto.fields.Fields;
+import com.cariochi.reflecto.fields.JavaField;
+import com.cariochi.reflecto.methods.JavaMethod;
 import com.cariochi.reflecto.methods.Methods;
 
 public interface Reflection {
@@ -21,8 +23,16 @@ public interface Reflection {
         return new Fields(getValue());
     }
 
+    default JavaField field(String name) {
+        return new Fields(getValue()).field(name);
+    }
+
     default Methods methods() {
         return new Methods(getValue());
+    }
+
+    default JavaMethod method(String name, Class<?>... argClasses) {
+        return new Methods(getValue()).method(name, argClasses);
     }
 
 }

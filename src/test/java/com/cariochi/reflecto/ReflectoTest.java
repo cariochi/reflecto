@@ -70,7 +70,7 @@ class ReflectoTest {
         final Reflection ref = reflect(bug);
         ref.invoke("setSummary(?)", "Modified bug");
         ref.invoke("getWatchers().get(?).setId(?)", 0, 1001);
-        ref.get("getWatchers().get(?)", 0).methods().get("setUsername(?)", String.class).invoke("java-dev");
+        ref.get("getWatchers().get(?)", 0).methods().method("setUsername(?)", String.class).invoke("java-dev");
         ref.invoke("getWatchers().remove(?)", 1);
         ref.invoke("getWatchers().add(?)", new User(1002, "pm"));
         ref.invoke("tags[?]=?", 0, "roles");
@@ -81,7 +81,7 @@ class ReflectoTest {
 
     @Test
     void should_get_java_field() {
-        final JavaField loadFactor = reflect(bug()).get("details").fields().get("loadFactor");
+        final JavaField loadFactor = reflect(bug()).get("details").fields().field("loadFactor");
         assertThat(loadFactor.getType()).isEqualTo(float.class);
         assertThat((float) loadFactor.getValue()).isEqualTo(0.75f);
     }
