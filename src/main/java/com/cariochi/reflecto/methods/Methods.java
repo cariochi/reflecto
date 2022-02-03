@@ -14,7 +14,7 @@ public class Methods {
 
     private final Object instance;
 
-    public JavaMethod get(String name, Class<?>... argClasses) {
+    public JavaMethod method(String name, Class<?>... argClasses) {
         return new JavaMethod(instance, substringBefore(name, "("), argClasses);
     }
 

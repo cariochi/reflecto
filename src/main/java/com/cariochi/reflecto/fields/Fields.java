@@ -14,7 +14,7 @@ public class Fields {
 
     private final Object instance;
 
-    public JavaField get(String name) {
+    public JavaField field(String name) {
         return new JavaField(instance, name);
     }
 

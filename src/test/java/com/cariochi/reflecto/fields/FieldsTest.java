@@ -11,19 +11,89 @@ import java.util.List;
 import static com.cariochi.reflecto.Reflecto.reflect;
 import static com.cariochi.reflecto.TestData.bug;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 class FieldsTest {
 
     @Test
     void should_get_field() {
-        final JavaField field = reflect(bug())
-                .get("watchers[0]")
-                .fields()
-                .get("username");
+        final Reflection reflect = reflect(bug());
+        final List<JavaField> fields = List.of(
+                reflect.get("watchers[?]", 0).fields().field("username"),
+                reflect.get("watchers[?]", 0).field("username"),
 
-        assertThat(field)
+                reflect.get("watchers[0]").fields().field("username"),
+                reflect.get("watchers[0]").field("username")
+        );
+        assertThat(fields)
                 .extracting(JavaField::getName, JavaField::getValue)
-                .containsExactly("username", "developer");
+                .containsOnly(tuple("username", "developer"));
+    }
+
+    @Test
+    void should_get_field_value() {
+        final Reflection reflection = reflect(bug());
+        final List<Object> usernames = List.of(
+
+                reflection.get("watchers").get("[?]", 0).get("username").getValue(),
+                reflection.get("watchers").get("[0]").get("username").getValue(),
+                reflection.get("watchers[?]", 0).get("username").getValue(),
+                reflection.get("watchers[0]").get("username").getValue(),
+                reflection.get("watchers[?].username", 0).getValue(),
+                reflection.get("watchers[0].username").getValue(),
+
+                reflection.get("watchers").get("[?]", 0).invoke("username"),
+                reflection.get("watchers").get("[0]").invoke("username"),
+                reflection.get("watchers[?]", 0).invoke("username"),
+                reflection.get("watchers[0]").invoke("username"),
+                reflection.invoke("watchers[?].username", 0),
+                reflection.invoke("watchers[0].username")
+
+        );
+        assertThat(usernames)
+                .containsOnly("developer");
+    }
+
+    @Test
+    void should_set_field_value() {
+        final Bug bug = bug();
+        final Reflection reflection = reflect(bug);
+
+        reflection.get("watchers").get("[?]", 0).get("username").setValue("TEST1");
+        assertThat(bug.getWatchers().get(0).getUsername()).isEqualTo("TEST1");
+
+        reflection.get("watchers").get("[0]").get("username").setValue("TEST2");
+        assertThat(bug.getWatchers().get(0).getUsername()).isEqualTo("TEST2");
+
+        reflection.get("watchers[?]", 0).get("username").setValue("TEST3");
+        assertThat(bug.getWatchers().get(0).getUsername()).isEqualTo("TEST3");
+
+        reflection.get("watchers[0]").get("username").setValue("TEST4");
+        assertThat(bug.getWatchers().get(0).getUsername()).isEqualTo("TEST4");
+
+        reflection.get("watchers[?].username", 0).setValue("TEST5");
+        assertThat(bug.getWatchers().get(0).getUsername()).isEqualTo("TEST5");
+
+        reflection.get("watchers[0].username").setValue("TEST6");
+        assertThat(bug.getWatchers().get(0).getUsername()).isEqualTo("TEST6");
+
+        reflection.get("watchers").get("[?]", 0).invoke("username=?", "TEST7");
+        assertThat(bug.getWatchers().get(0).getUsername()).isEqualTo("TEST7");
+
+        reflection.get("watchers").get("[0]").invoke("username=?", "TEST8");
+        assertThat(bug.getWatchers().get(0).getUsername()).isEqualTo("TEST8");
+
+        reflection.get("watchers[?]", 0).invoke("username=?", "TEST9");
+        assertThat(bug.getWatchers().get(0).getUsername()).isEqualTo("TEST9");
+
+        reflection.get("watchers[0]").invoke("username=?", "TEST10");
+        assertThat(bug.getWatchers().get(0).getUsername()).isEqualTo("TEST10");
+
+        reflection.invoke("watchers[?].username=?", 0, "TEST11");
+        assertThat(bug.getWatchers().get(0).getUsername()).isEqualTo("TEST11");
+
+        reflection.invoke("watchers[0].username=?", "TEST12");
+        assertThat(bug.getWatchers().get(0).getUsername()).isEqualTo("TEST12");
     }
 
     @Test
