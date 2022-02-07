@@ -33,7 +33,7 @@ assertThat(type.getTypeName())
 ### Types
 
 ```java
-Type type = type(Map.class, String.class, Integer.class);
+Type type = Types.type(Map.class, String.class, Integer.class);
 
 assertThat(type.getTypeName())
         .isEqualTo("java.util.Map<java.lang.String, java.lang.Integer>");
