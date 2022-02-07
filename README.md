@@ -6,17 +6,41 @@ Java Deep Reflection Library
 
 Please, see the recently published documentation [here](https://www.cariochi.com/reflecto). 
 
-## Maven dependency
+# Maven dependency
 
 ```markup
 <dependency>
     <groupId>com.cariochi.reflecto</groupId>
     <artifactId>reflecto</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.1</version>
 </dependency>
 ```
 
-## Example
+# Examples
+
+## Types
+
+### TypeReference
+
+```java
+TypeReference<Map<String, Integer>> typeReference = new TypeReference<>() {};
+Type type = typeReference.getType();
+
+assertThat(type.getTypeName())
+        .isEqualTo("java.util.Map<java.lang.String, java.lang.Integer>");
+```
+
+### Types
+
+```java
+Type type = type(Map.class, String.class, Integer.class);
+
+assertThat(type.getTypeName())
+        .isEqualTo("java.util.Map<java.lang.String, java.lang.Integer>");
+```
+
+
+## Fields and methods
 
 Example object:
 
@@ -34,11 +58,11 @@ Bug bug = Bug.builder()
         .build();
 ```
 
-## Fields Reflection
+### Fields
 
-### Simple
+#### Simple
 
-#### Get Value
+Get Value
 
 ```java
 String username = reflect(bug)
@@ -51,7 +75,7 @@ String username = reflect(bug)
         .invoke("reporter.username");
 ```
 
-#### Set Value
+Set Value
 
 ```java
 reflect(bug)
@@ -64,9 +88,9 @@ reflect(bug)
         .invoke("reporter.username=?","new_name");
 ```
 
-### List / Array
+#### List / Array
 
-#### Get Value
+Get Value
 
 ```java
 String username = reflect(bug)
@@ -79,7 +103,7 @@ String username = reflect(bug)
         .invoke("watchers[0].username");
 ```
 
-#### Set Value
+Set Value
 
 ```java
 reflect(bug)
@@ -97,9 +121,9 @@ reflect(bug)
         .invoke("watchers[?]=?", 0, new User("user4"));
 ```
 
-### Map
+#### Map
 
-#### Get Value
+Get Value
 
 ```java
 String sprint = reflect(bug)
@@ -112,7 +136,7 @@ String sprint = reflect(bug)
         .invoke("details[Sprint].text");
 ```
 
-#### Set Value
+Set Value
 
 ```java
 reflect(bug)
@@ -130,7 +154,7 @@ reflect(bug)
         .invoke("details[?]=?", "Sprint", new Details("SPR-002"));
 ```
 
-## Methods Reflection
+### Methods
 
 ```java
 String username = reflect(bug)
@@ -157,7 +181,7 @@ reflect(bug)
         .invoke("getDetails().put(?, ?)", "Sprint", new Details("SPR-002"));
 ```
 
-## Mixed Reflection
+### Mixed
 
 ```java
 String username = reflect(bug)
