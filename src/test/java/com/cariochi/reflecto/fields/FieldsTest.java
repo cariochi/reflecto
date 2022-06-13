@@ -2,8 +2,10 @@ package com.cariochi.reflecto.fields;
 
 import com.cariochi.reflecto.Reflection;
 import com.cariochi.reflecto.model.Bug;
+import com.cariochi.reflecto.model.Enclosing;
 import com.cariochi.reflecto.model.Id;
 import com.cariochi.reflecto.model.User;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -14,6 +16,53 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
 class FieldsTest {
+
+    @Nested
+    class EnclosingTest {
+        private final Enclosing enclosing = new Enclosing("bla bla");
+        private final Enclosing.NestedClass nested = enclosing.nested;
+
+        @Test
+        void should_get_enclosing_class_field() {
+            final List<JavaField> fields = reflect(nested).fields().all(true);
+            assertThat(fields)
+                    .extracting(JavaField::getName, JavaField::getValue)
+                    .containsExactlyInAnyOrder(
+                            tuple("this$0", enclosing),
+                            tuple("nested", enclosing.nested),
+                            tuple("summary", "bla bla"),
+                            tuple("deprecatedString", "has been"),
+                            tuple("deprecatedInt", -1));
+        }
+
+        @Test
+        void should_get_enclosing_class_field_with_annotation() {
+            final List<JavaField> fields = reflect(nested).fields().withAnnotation(Deprecated.class, true);
+            assertThat(fields)
+                    .extracting(JavaField::getName, JavaField::getValue)
+                    .containsExactlyInAnyOrder(
+                            tuple("deprecatedString", "has been"),
+                            tuple("deprecatedInt", -1));
+        }
+
+        @Test
+        void should_get_enclosing_class_field_with_type() {
+            final List<JavaField> fields = reflect(nested).fields().withType(String.class,true);
+            assertThat(fields)
+                    .extracting(JavaField::getName, JavaField::getValue)
+                    .containsExactlyInAnyOrder(
+                            tuple("summary", "bla bla"),
+                            tuple("deprecatedString", "has been"));
+        }
+
+        @Test
+        void should_get_enclosing_class_field_with_type_and_annotation() {
+            final List<JavaField> fields = reflect(nested).fields().withTypeAndAnnotation(String.class, Deprecated.class, true);
+            assertThat(fields)
+                    .extracting(JavaField::getName, JavaField::getValue)
+                    .containsExactly(tuple("deprecatedString", "has been"));
+        }
+    }
 
     @Test
     void should_get_field() {
