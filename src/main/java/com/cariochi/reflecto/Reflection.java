@@ -20,7 +20,11 @@ public interface Reflection {
     }
 
     default Fields fields() {
-        return new Fields(getValue());
+        return new Fields(getValue(), false);
+    }
+
+    default Fields fieldsIncludingEnclosing() {
+        return Fields.withEnclosing(getValue());
     }
 
     default JavaField field(String name) {

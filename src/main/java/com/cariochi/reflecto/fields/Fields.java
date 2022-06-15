@@ -4,11 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.reflect.FieldUtils;
 
 import java.lang.annotation.Annotation;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.cariochi.reflecto.Reflecto.reflect;
@@ -19,6 +16,15 @@ import static org.apache.commons.lang3.reflect.FieldUtils.getAllFieldsList;
 public class Fields {
 
     private final Object instance;
+    private final boolean includeEnclosing;
+
+    public Fields(Object instance) {
+        this(instance,false);
+    }
+
+    public static Fields withEnclosing(Object instance) {
+        return new Fields(instance, true);
+    }
 
     public JavaField field(String name) {
         return new JavaField(instance, name);
@@ -40,52 +46,53 @@ public class Fields {
                 .collect(toList());
     }
 
-    public List<JavaField> all() {
+    private List<JavaField> allWithoutEnclosing() {
         return getAllFieldsList(instance.getClass()).stream()
                 .map(field -> new JavaField(instance, field))
                 .collect(toList());
     }
 
-    public List<JavaField> all(boolean includeEnclosing) {
-        return includeEnclosing ? getEnclosingFields(Fields::all) : all();
+    public List<JavaField> all() {
+        return includeEnclosing
+                ? getEnclosingFields(Fields::allWithoutEnclosing)
+                : allWithoutEnclosing();
     }
 
-    public List<JavaField> withType(Class<?> fieldType) {
+    private List<JavaField> withTypeWithoutEnclosing(Class<?> fieldType) {
         return all().stream()
                 .filter(field -> fieldType.isAssignableFrom(field.getType()))
                 .collect(toList());
     }
 
-    public List<JavaField> withType(Class<?> fieldType, boolean includeEnclosing) {
+    public List<JavaField> withType(Class<?> fieldType) {
         return includeEnclosing
-                ? getEnclosingFields(fields -> fields.withType(fieldType))
-                : withType(fieldType);
+                ? getEnclosingFields(fields -> fields.withTypeWithoutEnclosing(fieldType))
+                : withTypeWithoutEnclosing(fieldType);
     }
 
-    public List<JavaField> withAnnotation(Class<? extends Annotation> annotationCls) {
+    private List<JavaField> withAnnotationWithoutEnclosing(Class<? extends Annotation> annotationCls) {
         return FieldUtils.getFieldsListWithAnnotation(instance.getClass(), annotationCls).stream()
                 .map(field -> new JavaField(instance, field))
                 .collect(toList());
     }
 
-    public List<JavaField> withAnnotation(Class<? extends Annotation> annotationCls, boolean includeEnclosing) {
+    public List<JavaField> withAnnotation(Class<? extends Annotation> annotationCls) {
         return includeEnclosing
-                ? getEnclosingFields(fields -> fields.withAnnotation(annotationCls))
-                : withAnnotation(annotationCls);
+                ? getEnclosingFields(fields -> fields.withAnnotationWithoutEnclosing(annotationCls))
+                : withAnnotationWithoutEnclosing(annotationCls);
     }
 
-    public List<JavaField> withTypeAndAnnotation(Class<?> fieldType,
-                                                 Class<? extends Annotation> annotationClass) {
+    private List<JavaField> withTypeAndAnnotationWithoutEnclosing(Class<?> fieldType,
+                                                                  Class<? extends Annotation> annotationClass) {
         return withAnnotation(annotationClass).stream()
                 .filter(field -> fieldType.isAssignableFrom(field.getType()))
                 .collect(toList());
     }
 
     public List<JavaField> withTypeAndAnnotation(Class<?> fieldType,
-                                                 Class<? extends Annotation> annotationCls,
-                                                 boolean includeEnclosing) {
+                                                 Class<? extends Annotation> annotationCls) {
         return includeEnclosing
-                ? getEnclosingFields(fields -> fields.withTypeAndAnnotation(fieldType, annotationCls))
-                : withTypeAndAnnotation(fieldType, annotationCls);
+                ? getEnclosingFields(fields -> fields.withTypeAndAnnotationWithoutEnclosing(fieldType, annotationCls))
+                : withTypeAndAnnotationWithoutEnclosing(fieldType, annotationCls);
     }
 }

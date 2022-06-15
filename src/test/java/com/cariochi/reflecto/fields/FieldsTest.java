@@ -21,11 +21,11 @@ class FieldsTest {
     class EnclosingTest {
         private final Enclosing enclosing = new Enclosing("bla bla");
         private final Enclosing.NestedClass nested = enclosing.nested;
+        private final Fields fields = reflect(nested).fieldsIncludingEnclosing();
 
         @Test
         void should_get_enclosing_class_field() {
-            final List<JavaField> fields = reflect(nested).fields().all(true);
-            assertThat(fields)
+            assertThat(fields.all())
                     .extracting(JavaField::getName, JavaField::getValue)
                     .containsExactlyInAnyOrder(
                             tuple("this$0", enclosing),
@@ -37,8 +37,7 @@ class FieldsTest {
 
         @Test
         void should_get_enclosing_class_field_with_annotation() {
-            final List<JavaField> fields = reflect(nested).fields().withAnnotation(Deprecated.class, true);
-            assertThat(fields)
+            assertThat(fields.withAnnotation(Deprecated.class))
                     .extracting(JavaField::getName, JavaField::getValue)
                     .containsExactlyInAnyOrder(
                             tuple("deprecatedString", "has been"),
@@ -47,8 +46,7 @@ class FieldsTest {
 
         @Test
         void should_get_enclosing_class_field_with_type() {
-            final List<JavaField> fields = reflect(nested).fields().withType(String.class,true);
-            assertThat(fields)
+            assertThat(fields.withType(String.class))
                     .extracting(JavaField::getName, JavaField::getValue)
                     .containsExactlyInAnyOrder(
                             tuple("summary", "bla bla"),
@@ -57,8 +55,7 @@ class FieldsTest {
 
         @Test
         void should_get_enclosing_class_field_with_type_and_annotation() {
-            final List<JavaField> fields = reflect(nested).fields().withTypeAndAnnotation(String.class, Deprecated.class, true);
-            assertThat(fields)
+            assertThat(fields.withTypeAndAnnotation(String.class, Deprecated.class))
                     .extracting(JavaField::getName, JavaField::getValue)
                     .containsExactly(tuple("deprecatedString", "has been"));
         }
