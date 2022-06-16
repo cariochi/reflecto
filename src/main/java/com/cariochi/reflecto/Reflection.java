@@ -23,12 +23,8 @@ public interface Reflection {
         return new Fields(getValue(), false);
     }
 
-    default Fields fieldsIncludingEnclosing() {
-        return Fields.withEnclosing(getValue());
-    }
-
     default JavaField field(String name) {
-        return new Fields(getValue()).field(name);
+        return fields().field(name);
     }
 
     default Methods methods() {
