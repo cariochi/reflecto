@@ -60,6 +60,10 @@ public class JavaField implements Reflection {
         return getType().isPrimitive();
     }
 
+    public boolean isSynthetic() {
+        return field.isSynthetic();
+    }
+
     public <A extends Annotation> Optional<A> findAnnotation(Class<A> annotationClass) {
         return Optional.ofNullable(field.getDeclaredAnnotation(annotationClass));
     }
