@@ -20,16 +20,16 @@ class FieldsTest {
     @Nested
     class EnclosingTest {
         private final Enclosing enclosing = new Enclosing("bla bla");
-        private final Enclosing.NestedClass nested = enclosing.nested;
-        private final Fields fields = reflect(nested).fieldsIncludingEnclosing();
+        private final Enclosing.NestedClass.SecondNestedClass nested = enclosing.nested.secondNested;
+        private final Fields fields = reflect(nested).fields().includeEnclosing();
 
         @Test
         void should_get_enclosing_class_field() {
             assertThat(fields.all())
                     .extracting(JavaField::getName, JavaField::getValue)
                     .containsExactlyInAnyOrder(
-                            tuple("this$0", enclosing),
                             tuple("nested", enclosing.nested),
+                            tuple("secondNested", enclosing.nested.secondNested),
                             tuple("summary", "bla bla"),
                             tuple("deprecatedString", "has been"),
                             tuple("deprecatedInt", -1));
