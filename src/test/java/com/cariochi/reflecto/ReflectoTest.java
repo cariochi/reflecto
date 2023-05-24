@@ -81,9 +81,9 @@ class ReflectoTest {
 
     @Test
     void should_get_java_field() {
-        final JavaField loadFactor = reflect(bug()).get("details").fields().field("loadFactor");
-        assertThat(loadFactor.getType()).isEqualTo(float.class);
-        assertThat((float) loadFactor.getValue()).isEqualTo(0.75f);
+        final JavaField loadFactor = reflect(bug()).get("reporter").fields().field("username");
+        assertThat(loadFactor.getType()).isEqualTo(String.class);
+        assertThat((String) loadFactor.getValue()).isEqualTo("qa");
     }
 
     void assertValueEquals(Reflection reflection, Object expected) {

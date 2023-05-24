@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.cariochi.reflecto.Reflecto.reflect;
@@ -29,7 +28,7 @@ public class Fields {
     public List<JavaField> all() {
         return getAllFieldsList(instance.getClass()).stream()
                 .flatMap(field -> javaFieldStream(instance, field))
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
     public List<JavaField> withType(Class<?> fieldType) {
