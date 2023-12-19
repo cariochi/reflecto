@@ -81,9 +81,17 @@ class ReflectoTest {
 
     @Test
     void should_get_java_field() {
-        final JavaField loadFactor = reflect(bug()).get("reporter").fields().field("username");
-        assertThat(loadFactor.getType()).isEqualTo(String.class);
-        assertThat((String) loadFactor.getValue()).isEqualTo("qa");
+        final JavaField reporter = reflect(bug()).get("reporter").fields().get("username");
+        assertThat(reporter.getType()).isEqualTo(String.class);
+        assertThat((String) reporter.getValue()).isEqualTo("qa");
+    }
+
+    @Test
+    void should_invoke_default_method() {
+        final Bug bug = bug();
+        final Reflection ref = reflect(bug);
+        final String testInfo = ref.invoke("getTestInfo()");
+        assertThat(testInfo).isEqualTo(bug.getTestInfo());
     }
 
     void assertValueEquals(Reflection reflection, Object expected) {

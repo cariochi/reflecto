@@ -2,9 +2,8 @@ package com.cariochi.reflecto.methods;
 
 import com.cariochi.reflecto.Reflection;
 import com.cariochi.reflecto.model.Id;
-import org.junit.jupiter.api.Test;
-
 import java.util.List;
+import org.junit.jupiter.api.Test;
 
 import static com.cariochi.reflecto.Reflecto.reflect;
 import static com.cariochi.reflecto.TestData.bug;
@@ -39,6 +38,12 @@ class MethodsTest {
         assertThat(methods)
                 .extracting(JavaMethod::getName, JavaMethod::getReturnType)
                 .containsExactly(tuple("getId", Integer.class));
+    }
+
+    @Test
+    void should_get_all_methods() {
+        final List<JavaMethod> methods = reflect(bug()).methods().asList();
+        assertThat(methods).hasSize(27);
     }
 
     @Test

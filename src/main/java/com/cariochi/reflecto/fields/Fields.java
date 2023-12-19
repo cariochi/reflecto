@@ -1,11 +1,10 @@
 package com.cariochi.reflecto.fields;
 
-import lombok.RequiredArgsConstructor;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.stream.Stream;
+import lombok.RequiredArgsConstructor;
 
 import static com.cariochi.reflecto.Reflecto.reflect;
 import static java.util.stream.Collectors.toList;
@@ -21,30 +20,30 @@ public class Fields {
         return new Fields(instance, true);
     }
 
-    public JavaField field(String name) {
+    public JavaField get(String name) {
         return new JavaField(instance, name);
     }
 
-    public List<JavaField> all() {
+    public List<JavaField> asList() {
         return getAllFieldsList(instance.getClass()).stream()
                 .flatMap(field -> javaFieldStream(instance, field))
                 .collect(toList());
     }
 
     public List<JavaField> withType(Class<?> fieldType) {
-        return all().stream()
+        return asList().stream()
                 .filter(field -> fieldType.isAssignableFrom(field.getType()))
                 .collect(toList());
     }
 
     public List<JavaField> withAnnotation(Class<? extends Annotation> annotationCls) {
-        return all().stream()
+        return asList().stream()
                 .filter(field -> field.findAnnotation(annotationCls).isPresent())
                 .collect(toList());
     }
 
     public List<JavaField> withTypeAndAnnotation(Class<?> fieldType, Class<? extends Annotation> annotationCls) {
-        return all().stream()
+        return asList().stream()
                 .filter(field -> field.findAnnotation(annotationCls).isPresent())
                 .filter(field -> fieldType.isAssignableFrom(field.getType()))
                 .collect(toList());
@@ -52,9 +51,12 @@ public class Fields {
 
     private Stream<JavaField> javaFieldStream(Object object, Field field) {
         final JavaField javaField = new JavaField(object, field);
-        return field.isSynthetic()
-                ? (includeEnclosing ? reflect(javaField.getValue()).fields().includeEnclosing().all().stream() : Stream.empty())
-                : Stream.of(javaField);
+        if (field.isSynthetic()) {
+            return includeEnclosing
+                    ? reflect(javaField.getValue()).fields().includeEnclosing().asList().stream()
+                    : Stream.empty();
+        }
+        return Stream.of(javaField);
     }
 
 }

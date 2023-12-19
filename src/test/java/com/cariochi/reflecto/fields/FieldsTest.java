@@ -5,10 +5,9 @@ import com.cariochi.reflecto.model.Bug;
 import com.cariochi.reflecto.model.Enclosing;
 import com.cariochi.reflecto.model.Id;
 import com.cariochi.reflecto.model.User;
+import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
 
 import static com.cariochi.reflecto.Reflecto.reflect;
 import static com.cariochi.reflecto.TestData.bug;
@@ -19,13 +18,14 @@ class FieldsTest {
 
     @Nested
     class EnclosingTest {
+
         private final Enclosing enclosing = new Enclosing("bla bla");
         private final Enclosing.NestedClass.SecondNestedClass nested = enclosing.nested.secondNested;
         private final Fields fields = reflect(nested).fields().includeEnclosing();
 
         @Test
         void should_get_enclosing_class_field() {
-            assertThat(fields.all())
+            assertThat(fields.asList())
                     .extracting(JavaField::getName, JavaField::getValue)
                     .containsExactlyInAnyOrder(
                             tuple("nested", enclosing.nested),
@@ -59,16 +59,17 @@ class FieldsTest {
                     .extracting(JavaField::getName, JavaField::getValue)
                     .containsExactly(tuple("deprecatedString", "has been"));
         }
+
     }
 
     @Test
     void should_get_field() {
         final Reflection reflect = reflect(bug());
         final List<JavaField> fields = List.of(
-                reflect.get("watchers[?]", 0).fields().field("username"),
+                reflect.get("watchers[?]", 0).fields().get("username"),
                 reflect.get("watchers[?]", 0).field("username"),
 
-                reflect.get("watchers[0]").fields().field("username"),
+                reflect.get("watchers[0]").fields().get("username"),
                 reflect.get("watchers[0]").field("username")
         );
         assertThat(fields)
@@ -147,7 +148,7 @@ class FieldsTest {
         final List<JavaField> fields = reflect(bug())
                 .get("watchers[0]")
                 .fields()
-                .all();
+                .asList();
 
         assertThat(fields).hasSize(2);
     }
@@ -209,7 +210,7 @@ class FieldsTest {
         assertThat(bug.getWatchers().get(1).getUsername()).isEqualTo("watcher2");
 
         reflection.invoke("details[?]=?", "Sprint", "SPR-002");
-        assertThat(bug.getDetails().get("Sprint")).isEqualTo("SPR-002");
+        assertThat(bug.getDetails()).containsEntry("Sprint", "SPR-002");
 
     }
 

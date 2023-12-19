@@ -15,7 +15,7 @@ import static lombok.AccessLevel.PRIVATE;
 @Setter(PRIVATE)
 @SuperBuilder
 @Jacksonized
-public class Bug extends Issue {
+public class Bug extends Issue implements TestInfoAware {
 
     private String[] tags;
 

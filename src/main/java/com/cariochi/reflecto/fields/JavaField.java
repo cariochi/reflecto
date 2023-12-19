@@ -1,18 +1,19 @@
 package com.cariochi.reflecto.fields;
 
 import com.cariochi.reflecto.Reflection;
-import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
-import org.apache.commons.lang3.reflect.FieldUtils;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
+import lombok.ToString;
+import org.apache.commons.lang3.reflect.FieldUtils;
 
 import static org.apache.commons.lang3.reflect.FieldUtils.getField;
 
+@ToString
 @RequiredArgsConstructor
 public class JavaField implements Reflection {
 

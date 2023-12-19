@@ -1,22 +1,25 @@
 package com.cariochi.reflecto.methods;
 
-import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
+import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
+import lombok.ToString;
 
 import static java.util.Comparator.comparingInt;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.IntStream.range;
+import static org.apache.commons.lang3.ClassUtils.getAllInterfaces;
 import static org.apache.commons.lang3.ClassUtils.getAllSuperclasses;
 import static org.apache.commons.lang3.ClassUtils.isAssignable;
 import static org.apache.commons.lang3.reflect.MethodUtils.getAnnotation;
 
+@ToString
 @RequiredArgsConstructor
 public class JavaMethod {
 
@@ -42,12 +45,17 @@ public class JavaMethod {
         return method.getName();
     }
 
-    public Class<?> getReturnType() {
-        return method.getReturnType();
+    public Type getReturnType() {
+        return method.getGenericReturnType();
+    }
+
+    public Type[] getParameterTypes() {
+        return method.getGenericParameterTypes();
     }
 
     private static Method getMatchingMethod(final Class<?> cls, final String methodName, final Class<?>... parameterTypes) {
-        return Stream.concat(Stream.of(cls), getAllSuperclasses(cls).stream())
+        return Stream.of(List.of(cls), getAllSuperclasses(cls), getAllInterfaces(cls))
+                .flatMap(List::stream)
                 .flatMap(c -> Stream.of(c.getDeclaredMethods()))
                 .filter(m -> methodName.equals(m.getName()) && isAssignable(parameterTypes, m.getParameterTypes(), true))
                 .collect(groupingBy(m -> distance(parameterTypes, m.getParameterTypes()))).entrySet().stream()
@@ -69,4 +77,5 @@ public class JavaMethod {
                 })
                 .sum();
     }
+
 }

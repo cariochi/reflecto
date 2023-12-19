@@ -24,7 +24,7 @@ public interface Reflection {
     }
 
     default JavaField field(String name) {
-        return fields().field(name);
+        return fields().get(name);
     }
 
     default Methods methods() {
