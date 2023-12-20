@@ -1,7 +1,7 @@
 package com.cariochi.reflecto.proxy;
 
-import com.cariochi.reflecto.proxy.ProxyFactory.MethodPostProcessor;
-import java.lang.reflect.InvocationHandler;
+import com.cariochi.reflecto.proxy.ProxyFactory.MethodHandler;
+import com.cariochi.reflecto.proxy.ProxyFactory.MethodProceed;
 import java.lang.reflect.Method;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
@@ -14,12 +14,7 @@ class InterfaceProxyFactoryTest {
 
     @Test
     void should_create_proxy() {
-        final ProxyFactory proxyFactory = ProxyFactory.builder()
-                .implementsInterface(MyInterface.class)
-                .methodInterceptor(MyMethodInterceptor::new)
-                .build();
-
-        final MyInterface instance = proxyFactory.create();
+        final MyInterface instance = ProxyFactory.createInstance(new MyMethodHandler(), MyInterface.class);
 
         assertThat(instance.toString()).startsWith("com.cariochi.reflecto.proxy.");
         assertThat(instance.hashCode()).isNotZero();
@@ -28,16 +23,19 @@ class InterfaceProxyFactoryTest {
         assertThat(instance.sayHello()).isEqualTo("Hello!!!");
     }
 
-    public static class MyMethodInterceptor implements InvocationHandler, MethodPostProcessor {
+    public static class MyMethodHandler implements MethodHandler {
 
         @Override
-        public Object invoke(Object proxy, Method method, Object[] args) {
-            return format("You called %s(%s)", method.getName(), Stream.of(args).map(String::valueOf).collect(joining(", ")));
-        }
+        public Object invoke(Object proxy, Method method, Object[] args, MethodProceed proceed) throws Throwable {
+            if (method.getDeclaringClass().equals(Object.class)) {
+                return proceed.proceed();
+            }
 
-        @Override
-        public Object postProcess(Object proxy, Method method, Object[] args, Object result) {
-            return result + "!!!";
+            if (proceed == null) {
+                return format("You called %s(%s)", method.getName(), Stream.of(args).map(String::valueOf).collect(joining(", ")));
+            } else {
+                return proceed.proceed() + "!!!";
+            }
         }
 
     }

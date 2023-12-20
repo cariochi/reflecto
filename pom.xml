@@ -7,7 +7,7 @@
 
     <groupId>com.cariochi.reflecto</groupId>
     <artifactId>reflecto</artifactId>
-    <version>1.1.5</version>
+    <version>1.1.6</version>
     <name>Reflecto</name>
     <description>Java Deep Reflection Library</description>
     <url>https://cariochi.com/reflecto</url>
@@ -72,11 +72,6 @@
             <groupId>org.javassist</groupId>
             <artifactId>javassist</artifactId>
             <version>${javassist.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>cglib</groupId>
-            <artifactId>cglib</artifactId>
-            <version>3.3.0</version>
         </dependency>
 
         <dependency>

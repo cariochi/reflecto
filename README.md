@@ -12,7 +12,7 @@ Please, see the recently published documentation [here](https://www.cariochi.com
 <dependency>
     <groupId>com.cariochi.reflecto</groupId>
     <artifactId>reflecto</artifactId>
-    <version>1.1.5</version>
+    <version>1.1.6</version>
 </dependency>
 ```
 

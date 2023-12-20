@@ -1,93 +1,68 @@
 package com.cariochi.reflecto.proxy;
 
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
-import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
+import java.util.Iterator;
 import java.util.List;
-import java.util.function.Supplier;
-import lombok.Builder;
+import java.util.stream.Stream;
+import javassist.util.proxy.ProxyObject;
 import lombok.RequiredArgsConstructor;
-import lombok.Singular;
 import lombok.SneakyThrows;
-import net.sf.cglib.proxy.Enhancer;
-import net.sf.cglib.proxy.MethodInterceptor;
-import net.sf.cglib.proxy.MethodProxy;
+import lombok.experimental.UtilityClass;
 
-import static java.lang.invoke.MethodType.methodType;
+import static java.util.stream.Collectors.toList;
 
-@RequiredArgsConstructor
-@Builder
+@UtilityClass
 public class ProxyFactory {
 
-    private final Class<?> extendsClass;
-
-    @Singular
-    private final List<Class<?>> implementsInterfaces;
-
-    private final Supplier<InvocationHandler> methodInterceptor;
-
-    public <T> T create() {
-        final Enhancer enhancer = new Enhancer();
-        enhancer.setSuperclass(extendsClass);
-        if (!implementsInterfaces.isEmpty()) {
-            enhancer.setInterfaces(implementsInterfaces.toArray(Class<?>[]::new));
+    @SneakyThrows
+    public static <T> T createInstance(MethodHandler methodHandler, Class<?>... types) {
+        final javassist.util.proxy.ProxyFactory factory = new javassist.util.proxy.ProxyFactory();
+        factory.setSuperclass(getSuperClass(types));
+        final List<Class<?>> interfaces = getInterfaces(types);
+        if (!interfaces.isEmpty()) {
+            factory.setInterfaces(interfaces.toArray(Class<?>[]::new));
         }
-        enhancer.setCallback(new ProxyMethodInterceptor(methodInterceptor.get()));
-        return (T) enhancer.create();
+        final Class<?> proxyClass = factory.createClass();
+        final T proxyInstance = (T) proxyClass.newInstance();
+        ((ProxyObject) proxyInstance).setHandler(new ProxyMethodHandler(methodHandler));
+        return proxyInstance;
+
     }
 
-    public interface MethodPostProcessor {
+    private static List<Class<?>> getInterfaces(Class<?>[] types) {
+        return Stream.of(types).filter(Class::isInterface).collect(toList());
+    }
 
-        Object postProcess(Object proxy, Method method, Object[] args, Object result);
+    private static Class<?> getSuperClass(Class<?>[] types) {
+        final List<Class<?>> superClasses = Stream.of(types).filter(t -> !t.isInterface()).collect(toList());
+        if (superClasses.size() > 1) {
+            throw new IllegalArgumentException("Single super class allowed");
+        }
+        final Iterator<Class<?>> iterator = superClasses.iterator();
+        return iterator.hasNext() ? iterator.next() : null;
+    }
+
+
+    public interface MethodHandler {
+
+        Object invoke(Object proxy, Method method, Object[] args, MethodProceed proceed) throws Throwable;
+
+    }
+
+    public interface MethodProceed {
+
+        Object proceed() throws Throwable;
 
     }
 
     @RequiredArgsConstructor
-    private static class ProxyMethodInterceptor implements MethodInterceptor {
+    private static class ProxyMethodHandler implements javassist.util.proxy.MethodHandler {
 
-        private final InvocationHandler handler;
+        private final MethodHandler handler;
 
         @Override
-        public Object intercept(Object proxy, Method method, Object[] args, MethodProxy methodProxy) throws Throwable {
-            if (Modifier.isAbstract(method.getModifiers())) {
-                return handler.invoke(proxy, method, args);
-            } else if (method.getDeclaringClass().equals(Object.class)) {
-                return invokeObjectMethod(proxy, method, args);
-            } else {
-                final Object result = invokeDefaultMethod(proxy, method, args, methodProxy);
-                if (handler instanceof ProxyFactory.MethodPostProcessor) {
-                    return ((MethodPostProcessor) handler).postProcess(proxy, method, args, result);
-                } else {
-                    return result;
-                }
-            }
-        }
-
-        @SneakyThrows
-        private Object invokeDefaultMethod(Object proxy, Method method, Object[] args, MethodProxy methodProxy) {
-            if (method.isDefault()) {
-                final MethodType methodType = methodType(method.getReturnType(), method.getParameterTypes());
-                return MethodHandles.lookup()
-                        .findSpecial(method.getDeclaringClass(), method.getName(), methodType, method.getDeclaringClass())
-                        .bindTo(proxy)
-                        .invokeWithArguments(args);
-            } else {
-                return methodProxy.invokeSuper(proxy, args);
-            }
-        }
-
-        @SneakyThrows
-        private Object invokeObjectMethod(Object proxy, Method method, Object[] args) {
-            if (args != null) {
-                for (int i = 0; i < args.length; i++) {
-                    if (args[i] == proxy) {
-                        args[i] = this;
-                    }
-                }
-            }
-            return method.invoke(this, args);
+        public Object invoke(Object proxy, Method method, Method proceed, Object[] args) throws Throwable {
+            return handler.invoke(proxy, method, args, proceed == null ? null : () -> proceed.invoke(proxy, args));
         }
 
     }
