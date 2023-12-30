@@ -1,12 +1,15 @@
 package com.cariochi.reflecto.types;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.stream.Stream;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.lang.reflect.Type;
-import java.util.*;
-import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
@@ -17,7 +20,7 @@ import static org.apache.commons.lang3.StringUtils.substringBefore;
 @Getter
 @EqualsAndHashCode
 @NoArgsConstructor(access = PRIVATE)
-public final class TypeName {
+public class TypeName {
 
     private static final Set<String> PRIMITIVE_TYPES = Set.of("byte", "short", "int", "long", "float", "double", "char", "boolean");
 
@@ -30,17 +33,20 @@ public final class TypeName {
 
     private final List<TypeName> arguments = new ArrayList<>();
 
-    public static TypeName of(Type type, Type... typeArguments) {
+    public static TypeName of(Class<?> rawType, Type... typeArguments) {
         final TypeName typeName = new TypeName();
-        typeName.name = substringBefore(type.getTypeName(), "[");
+        typeName.name = substringBefore(rawType.getTypeName(), "[");
         typeName.arguments.addAll(Stream.of(typeArguments)
-                .map(Type::getTypeName)
-                .map(TypeName::parse)
+                .map(TypeName::of)
                 .peek(a -> a.parent = typeName)
                 .collect(toList())
         );
-        typeName.dimension = countMatches(type.getTypeName(), "[");
+        typeName.dimension = countMatches(rawType.getTypeName(), "[");
         return typeName;
+    }
+
+    public static TypeName of(Type type) {
+        return TypeName.parse(type.getTypeName());
     }
 
     public static TypeName parse(String type) {
@@ -81,7 +87,7 @@ public final class TypeName {
         return List.copyOf(arguments);
     }
 
-    public TypeName add() {
+    private TypeName add() {
         final TypeName argument = new TypeName();
         argument.parent = this;
         arguments.add(argument);

@@ -5,13 +5,12 @@ import com.cariochi.reflecto.fields.JavaField;
 import com.cariochi.reflecto.fields.ListField;
 import com.cariochi.reflecto.fields.MapField;
 import com.cariochi.reflecto.methods.JavaMethod;
-
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
 import static com.cariochi.reflecto.Reflecto.reflect;
+import static com.cariochi.reflecto.utils.CollectionUtils.queueOf;
 import static java.lang.Integer.parseInt;
 import static org.apache.commons.lang3.ClassUtils.toClass;
 import static org.apache.commons.lang3.StringUtils.substringBefore;
@@ -33,7 +32,7 @@ public class Invocation {
         if (isMethod) {
             return reflect(getMethod(instance).invoke(args));
         } else {
-            Queue<Object> argsQueue = new LinkedList<>(List.of(args));
+            Queue<Object> argsQueue = queueOf(args);
             final Reflection field = getField(instance, argsQueue);
             if (!argsQueue.isEmpty()) {
                 field.setValue(argsQueue.poll());

@@ -1,15 +1,18 @@
 package com.cariochi.reflecto.types;
 
-import javassist.bytecode.SignatureAttribute;
-import javassist.bytecode.SignatureAttribute.*;
-import javassist.util.proxy.ProxyFactory;
-import lombok.experimental.UtilityClass;
-
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javassist.bytecode.SignatureAttribute;
+import javassist.bytecode.SignatureAttribute.ArrayType;
+import javassist.bytecode.SignatureAttribute.BaseType;
+import javassist.bytecode.SignatureAttribute.ClassSignature;
+import javassist.bytecode.SignatureAttribute.ClassType;
+import javassist.bytecode.SignatureAttribute.TypeArgument;
+import javassist.util.proxy.ProxyFactory;
+import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class Types {
@@ -26,12 +29,16 @@ public class Types {
         return type(Map.class, keyType, valueType);
     }
 
-    public static Type type(String typeName) {
-        return type(TypeName.parse(typeName));
+    public static Type arrayOf(Type type) {
+        return Types.type(type.getTypeName() + "[]");
     }
 
-    public static Type type(Class<?> rawClass, Type... typeArguments) {
-        return type(TypeName.of(rawClass, typeArguments));
+    public static Type type(Class<?> rawType, Type... typeArguments) {
+        return type(TypeName.of(rawType, typeArguments));
+    }
+
+    public static Type type(String typeName) {
+        return type(TypeName.parse(typeName));
     }
 
     public static Type type(TypeName typeName) {

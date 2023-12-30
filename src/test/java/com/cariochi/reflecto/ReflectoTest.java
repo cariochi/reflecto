@@ -65,6 +65,18 @@ class ReflectoTest {
     }
 
     @Test
+    void should_set_field_value_with_nulls() {
+        final Bug bug = bug();
+        final Reflection ref = reflect(bug);
+        ref.invoke("summary=?", null);
+        ref.invoke("watchers[0].id=?", null);
+        ref.invoke("tags[?]=?", 0, null);
+        assertThat(bug)
+                .extracting(Bug::getSummary, b -> b.getWatchers().get(0).getId(), b -> b.getTags()[0])
+                .containsOnlyNulls();
+    }
+
+    @Test
     void should_invoke_method() {
         final Bug bug = bug();
         final Reflection ref = reflect(bug);
@@ -73,10 +85,22 @@ class ReflectoTest {
         ref.get("getWatchers().get(?)", 0).methods().method("setUsername(?)", String.class).invoke("java-dev");
         ref.invoke("getWatchers().remove(?)", 1);
         ref.invoke("getWatchers().add(?)", new User(1002, "pm"));
-        ref.invoke("tags[?]=?", 0, "roles");
+        ref.invoke("getTags()[?]=?", 0, "roles");
         ref.invoke("getDetails().remove(?)", "Sprint");
         ref.invoke("getDetails().put(?,?)", "Sprint", "SPR-002");
         assertThat(bug).isEqualTo(modifiedBug());
+    }
+
+    @Test
+    void should_invoke_method_with_nulls() {
+        final Bug bug = bug();
+        final Reflection ref = reflect(bug);
+        ref.invoke("setSummary(?)", null);
+        ref.invoke("getWatchers().get(?).setId(?)", 0, null);
+        ref.invoke("getTags()[?]=?", 0, null);
+        assertThat(bug)
+                .extracting(Bug::getSummary, b -> b.getWatchers().get(0).getId(), b -> b.getTags()[0])
+                .containsOnlyNulls();
     }
 
     @Test

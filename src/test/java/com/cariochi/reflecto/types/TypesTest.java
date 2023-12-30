@@ -1,23 +1,23 @@
 package com.cariochi.reflecto.types;
 
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
-
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
+import static com.cariochi.reflecto.types.Types.arrayOf;
 import static com.cariochi.reflecto.types.Types.type;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 class TypesTest {
 
-    private static Stream<Arguments> test() {
+    private static Stream<Arguments> types() {
         return Stream.of(
                 arguments("java.util.List<java.lang.String>", type(List.class, String.class)),
                 arguments("java.util.ArrayList<java.lang.Integer[]>", type(ArrayList.class, Integer[].class)),
@@ -35,12 +35,21 @@ class TypesTest {
     }
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("types")
     void test(String name, Type type) {
         assertThat(type)
                 .isEqualTo(type(name))
                 .extracting(Type::getTypeName)
                 .isEqualTo(name);
+    }
+
+    @ParameterizedTest
+    @MethodSource("types")
+    void should_create_array(String name, Type type) {
+        final Type array = arrayOf(type);
+        assertThat(array.getTypeName())
+                .isEqualTo(name + "[]");
+
     }
 
 }

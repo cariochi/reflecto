@@ -1,12 +1,15 @@
 package com.cariochi.reflecto;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Queue;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.*;
-import java.util.stream.Stream;
-
 import static com.cariochi.reflecto.Reflecto.reflect;
+import static com.cariochi.reflecto.utils.CollectionUtils.queueOf;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
@@ -21,7 +24,7 @@ public class Invocations {
     private final List<Invocation> invocations;
 
     public static Invocations parse(String path, Object... args) {
-        final Queue<Object> params = new LinkedList<>(List.of(args));
+        final Queue<Object> params = queueOf(args);
         final List<Invocation> invocations = stream(path.split("\\."))
                 .flatMap(Invocations::splitByBrackets)
                 .map(name -> new Invocation(

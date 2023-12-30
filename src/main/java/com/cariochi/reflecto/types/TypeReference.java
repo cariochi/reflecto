@@ -1,15 +1,14 @@
 package com.cariochi.reflecto.types;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-
+@Getter
 @EqualsAndHashCode
 public abstract class TypeReference<T> {
 
-    @Getter
     private final Type type;
 
     public TypeReference() {
