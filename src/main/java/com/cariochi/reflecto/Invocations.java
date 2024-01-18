@@ -27,21 +27,25 @@ public class Invocations {
         final Queue<Object> params = queueOf(args);
         final List<Invocation> invocations = stream(path.split("\\."))
                 .flatMap(Invocations::splitByBrackets)
+                .map(StringUtils::trim)
                 .map(name -> new Invocation(
-                        substringBefore(name, "="),
+                        substringBefore(name, "=").trim(),
                         range(0, countMatches(name, '?')).mapToObj(i -> params.poll()).collect(toList()))
                 )
                 .collect(toList());
         return new Invocations(invocations);
     }
 
-    public Reflection apply(Object instance) {
+    public List<Reflection> apply(Object instance) {
         final Iterator<Invocation> iterator = invocations.iterator();
-        Reflection reflection = reflect(instance);
+        List<Reflection> reflections = List.of(reflect(instance));
         while (iterator.hasNext()) {
-            reflection = iterator.next().apply(reflection.getValue());
+            final Invocation nextInvocation = iterator.next();
+            reflections = reflections.stream()
+                    .flatMap(reflection -> nextInvocation.apply(reflection.getValue()).stream())
+                    .collect(toList());
         }
-        return reflection;
+        return reflections;
     }
 
     private static Stream<String> splitByBrackets(String s) {

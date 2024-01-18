@@ -1,9 +1,11 @@
 package com.cariochi.reflecto;
 
+import com.cariochi.reflecto.fields.CompositeReflection;
 import com.cariochi.reflecto.fields.Fields;
 import com.cariochi.reflecto.fields.JavaField;
 import com.cariochi.reflecto.methods.JavaMethod;
 import com.cariochi.reflecto.methods.Methods;
+import java.util.List;
 
 public interface Reflection {
 
@@ -12,7 +14,8 @@ public interface Reflection {
     <V> void setValue(V value);
 
     default Reflection get(String path, Object... args) {
-        return Invocations.parse(path, args).apply(getValue());
+        final List<Reflection> reflections = Invocations.parse(path, args).apply(getValue());
+        return path.contains("[*]") ? new CompositeReflection(reflections) : reflections.get(0);
     }
 
     default <V> V invoke(String path, Object... args) {

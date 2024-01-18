@@ -2,14 +2,15 @@ package com.cariochi.reflecto.methods;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import lombok.ToString;
 
 import static java.util.Comparator.comparingInt;
 import static java.util.stream.Collectors.groupingBy;
@@ -19,7 +20,7 @@ import static org.apache.commons.lang3.ClassUtils.getAllSuperclasses;
 import static org.apache.commons.lang3.ClassUtils.isAssignable;
 import static org.apache.commons.lang3.reflect.MethodUtils.getAnnotation;
 
-@ToString
+@Data
 @RequiredArgsConstructor
 public class JavaMethod {
 
@@ -49,8 +50,40 @@ public class JavaMethod {
         return method.getGenericReturnType();
     }
 
+    public Class<?> getDeclaringClass() {
+        return method.getDeclaringClass();
+    }
+
     public Type[] getParameterTypes() {
         return method.getGenericParameterTypes();
+    }
+
+    public boolean isPublic() {
+        return Modifier.isPublic(method.getModifiers());
+    }
+
+    public boolean isPrivate() {
+        return Modifier.isPrivate(method.getModifiers());
+    }
+
+    public boolean isProtected() {
+        return Modifier.isProtected(method.getModifiers());
+    }
+
+    public boolean isAbstract() {
+        return Modifier.isAbstract(method.getModifiers());
+    }
+
+    public boolean isStatic() {
+        return Modifier.isStatic(method.getModifiers());
+    }
+
+    public boolean isFinal() {
+        return Modifier.isFinal(method.getModifiers());
+    }
+
+    public boolean isTransient() {
+        return Modifier.isTransient(method.getModifiers());
     }
 
     private static Method getMatchingMethod(final Class<?> cls, final String methodName, final Class<?>... parameterTypes) {

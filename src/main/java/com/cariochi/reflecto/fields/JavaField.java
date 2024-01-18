@@ -6,14 +6,12 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.Optional;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import lombok.ToString;
 import org.apache.commons.lang3.reflect.FieldUtils;
 
-import static org.apache.commons.lang3.reflect.FieldUtils.getField;
-
-@ToString
+@Data
 @RequiredArgsConstructor
 public class JavaField implements Reflection {
 
@@ -22,19 +20,15 @@ public class JavaField implements Reflection {
 
     public JavaField(Object target, String fieldName) {
         this.target = target;
-        this.field = getField(target.getClass(), fieldName, true);
+        this.field = FieldUtils.getField(target.getClass(), fieldName, true);
     }
 
     public String getName() {
         return field.getName();
     }
 
-    public Object getTarget() {
-        return target;
-    }
-
-    public Class<?> getTargetClass() {
-        return target.getClass();
+    public Class<?> getDeclaringClass() {
+        return field.getDeclaringClass();
     }
 
     public Type getGenericType() {
@@ -43,6 +37,18 @@ public class JavaField implements Reflection {
 
     public Class<?> getType() {
         return field.getType();
+    }
+
+    public boolean isPublic() {
+        return Modifier.isPublic(field.getModifiers());
+    }
+
+    public boolean isPrivate() {
+        return Modifier.isPrivate(field.getModifiers());
+    }
+
+    public boolean isProtected() {
+        return Modifier.isProtected(field.getModifiers());
     }
 
     public boolean isStatic() {
