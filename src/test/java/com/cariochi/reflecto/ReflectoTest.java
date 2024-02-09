@@ -1,8 +1,11 @@
 package com.cariochi.reflecto;
 
-import com.cariochi.reflecto.fields.JavaField;
+import com.cariochi.reflecto.fields.TargetField;
+import com.cariochi.reflecto.invocations.model.Reflection;
 import com.cariochi.reflecto.model.Bug;
 import com.cariochi.reflecto.model.User;
+import com.cariochi.reflecto.types.ReflectoType;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 import static com.cariochi.reflecto.Reflecto.reflect;
@@ -14,63 +17,63 @@ class ReflectoTest {
 
     @Test
     void should_get_field_value() {
-        final Reflection ref = reflect(bug());
-        assertValueEquals(ref.get("reporter.id"), 100);
-        assertValueEquals(ref.get("getReporter().getId()"), 100);
-        assertValueEquals(ref.get("reporter.username"), "qa");
-        assertValueEquals(ref.get("getReporter().getUsername()"), "qa");
+        final Reflection bug = reflect(bug());
+        assertValueEquals(bug.reflect("reporter.id"), 100);
+        assertValueEquals(bug.reflect("getReporter().getId()"), 100);
+        assertValueEquals(bug.reflect("reporter.username"), "qa");
+        assertValueEquals(bug.reflect("getReporter().getUsername()"), "qa");
     }
 
     @Test
     void should_get_field_of_list() {
-        final Reflection ref = reflect(bug());
-        assertValueEquals(ref.get("watchers[1].username"), "manager");
-        assertValueEquals(ref.get("getWatchers()[1].username"), "manager");
-        assertValueEquals(ref.get("watchers.get(?).username", 1), "manager");
-        assertValueEquals(ref.get("getWatchers().get(?).username", 1), "manager");
-        assertValueEquals(ref.get("watchers").get("[1]").get("username"), "manager");
-        assertValueEquals(ref.get("getWatchers()").get("get(?)", 1).get("getUsername()"), "manager");
+        final Reflection bug = reflect(bug());
+        assertValueEquals(bug.reflect("watchers[1].username"), "manager");
+        assertValueEquals(bug.reflect("getWatchers()[1].username"), "manager");
+        assertValueEquals(bug.reflect("watchers.get(?).username", 1), "manager");
+        assertValueEquals(bug.reflect("getWatchers().get(?).username", 1), "manager");
+        assertValueEquals(bug.reflect("watchers").reflect("[1]").reflect("username"), "manager");
+        assertValueEquals(bug.reflect("getWatchers()").reflect("get(?)", 1).reflect("getUsername()"), "manager");
     }
 
     @Test
     void should_get_field_of_array() {
-        final Reflection ref = reflect(bug());
-        assertValueEquals(ref.get("tags[1]"), "user");
-        assertValueEquals(ref.get("getTags()[1]"), "user");
+        final Reflection bug = reflect(bug());
+        assertValueEquals(bug.reflect("tags[1]"), "user");
+        assertValueEquals(bug.reflect("getTags()[1]"), "user");
     }
 
     @Test
     void should_get_field_of_map() {
-        final Reflection ref = reflect(bug());
-        assertValueEquals(ref.get("details[Sprint]"), "SPR-001");
-        assertValueEquals(ref.get("getDetails()[Sprint]"), "SPR-001");
-        assertValueEquals(ref.get("details.get(?)", "Sprint"), "SPR-001");
-        assertValueEquals(ref.get("getDetails().get(?)", "Sprint"), "SPR-001");
-        assertValueEquals(ref.get("details").get("[Sprint]"), "SPR-001");
-        assertValueEquals(ref.get("getDetails()").get("get(?)", "Sprint"), "SPR-001");
+        final Reflection bug = reflect(bug());
+        assertValueEquals(bug.reflect("details[Sprint]"), "SPR-001");
+        assertValueEquals(bug.reflect("getDetails()[Sprint]"), "SPR-001");
+        assertValueEquals(bug.reflect("details.get(?)", "Sprint"), "SPR-001");
+        assertValueEquals(bug.reflect("getDetails().get(?)", "Sprint"), "SPR-001");
+        assertValueEquals(bug.reflect("details").reflect("[Sprint]"), "SPR-001");
+        assertValueEquals(bug.reflect("getDetails()").reflect("get(?)", "Sprint"), "SPR-001");
     }
 
     @Test
     void should_set_field_value() {
         final Bug bug = bug();
-        final Reflection ref = reflect(bug);
-        ref.invoke("summary=?", "Modified bug");
-        ref.invoke("watchers[0].id=?", 1001);
-        ref.invoke("watchers.get(?).username=?", 0, "java-dev");
-        ref.get("watchers.get(?).id", 1).setValue(1002);
-        ref.get("watchers.get(?).username", 1).setValue("pm");
-        ref.get("tags[0]").setValue("roles");
-        ref.get("details[?]", "Sprint").setValue("SPR-002");
+        final Reflection reflection = reflect(bug);
+        reflection.perform("summary=?", "Modified bug");
+        reflection.perform("watchers[0].id=?", 1001);
+        reflection.perform("watchers.get(?).username=?", 0, "java-dev");
+        reflection.reflect("watchers.get(?).id", 1).setValue(1002);
+        reflection.reflect("watchers.get(?).username", 1).setValue("pm");
+        reflection.reflect("tags[0]").setValue("roles");
+        reflection.reflect("details[?]", "Sprint").setValue("SPR-002");
         assertThat(bug).isEqualTo(modifiedBug());
     }
 
     @Test
     void should_set_field_value_with_nulls() {
         final Bug bug = bug();
-        final Reflection ref = reflect(bug);
-        ref.invoke("summary=?", null);
-        ref.invoke("watchers[0].id=?", null);
-        ref.invoke("tags[?]=?", 0, null);
+        final Reflection reflection = reflect(bug);
+        reflection.perform("summary=?", null);
+        reflection.perform("watchers[0].id=?", null);
+        reflection.perform("tags[?]=?", 0, null);
         assertThat(bug)
                 .extracting(Bug::getSummary, b -> b.getWatchers().get(0).getId(), b -> b.getTags()[0])
                 .containsOnlyNulls();
@@ -79,25 +82,25 @@ class ReflectoTest {
     @Test
     void should_invoke_method() {
         final Bug bug = bug();
-        final Reflection ref = reflect(bug);
-        ref.invoke("setSummary(?)", "Modified bug");
-        ref.invoke("getWatchers().get(?).setId(?)", 0, 1001);
-        ref.get("getWatchers().get(?)", 0).methods().method("setUsername(?)", String.class).invoke("java-dev");
-        ref.invoke("getWatchers().remove(?)", 1);
-        ref.invoke("getWatchers().add(?)", new User(1002, "pm"));
-        ref.invoke("getTags()[?]=?", 0, "roles");
-        ref.invoke("getDetails().remove(?)", "Sprint");
-        ref.invoke("getDetails().put(?,?)", "Sprint", "SPR-002");
+        final Reflection reflection = reflect(bug);
+        reflection.perform("setSummary(?)", "Modified bug");
+        reflection.perform("getWatchers().get(?).setId(?)", 0, 1001);
+        reflection.reflect("getWatchers().get(?)", 0).methods().find("setUsername(?)", String.class).ifPresent(method -> method.invoke("java-dev"));
+        reflection.perform("getWatchers().remove(?)", 1);
+        reflection.perform("getWatchers().add(?)", new User(1002, "pm"));
+        reflection.perform("getTags()[?]=?", 0, "roles");
+        reflection.perform("getDetails().remove(?)", "Sprint");
+        reflection.perform("getDetails().put(?,?)", "Sprint", "SPR-002");
         assertThat(bug).isEqualTo(modifiedBug());
     }
 
     @Test
     void should_invoke_method_with_nulls() {
         final Bug bug = bug();
-        final Reflection ref = reflect(bug);
-        ref.invoke("setSummary(?)", null);
-        ref.invoke("getWatchers().get(?).setId(?)", 0, null);
-        ref.invoke("getTags()[?]=?", 0, null);
+        final Reflection reflection = reflect(bug);
+        reflection.perform("setSummary(?)", null);
+        reflection.perform("getWatchers().get(?).setId(?)", 0, null);
+        reflection.perform("getTags()[?]=?", 0, null);
         assertThat(bug)
                 .extracting(Bug::getSummary, b -> b.getWatchers().get(0).getId(), b -> b.getTags()[0])
                 .containsOnlyNulls();
@@ -105,16 +108,23 @@ class ReflectoTest {
 
     @Test
     void should_get_java_field() {
-        final JavaField reporter = reflect(bug()).get("reporter").fields().get("username");
-        assertThat(reporter.getType()).isEqualTo(String.class);
-        assertThat((String) reporter.getValue()).isEqualTo("qa");
+        final Optional<TargetField> reporter = reflect(bug()).reflect("reporter").fields().find("username");
+
+        assertThat(reporter)
+                .map(TargetField::type)
+                .map(ReflectoType::actualType)
+                .contains(String.class);
+
+        assertThat(reporter)
+                .map(TargetField::getValue)
+                .contains("qa");
     }
 
     @Test
     void should_invoke_default_method() {
         final Bug bug = bug();
-        final Reflection ref = reflect(bug);
-        final String testInfo = ref.invoke("getTestInfo()");
+        final Reflection reflection = reflect(bug);
+        final String testInfo = reflection.perform("getTestInfo()");
         assertThat(testInfo).isEqualTo(bug.getTestInfo());
     }
 

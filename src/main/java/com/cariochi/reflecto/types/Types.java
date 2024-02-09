@@ -7,12 +7,12 @@ import java.util.Map;
 import java.util.Set;
 import javassist.bytecode.SignatureAttribute;
 import javassist.bytecode.SignatureAttribute.ArrayType;
-import javassist.bytecode.SignatureAttribute.BaseType;
 import javassist.bytecode.SignatureAttribute.ClassSignature;
 import javassist.bytecode.SignatureAttribute.ClassType;
 import javassist.bytecode.SignatureAttribute.TypeArgument;
 import javassist.util.proxy.ProxyFactory;
 import lombok.experimental.UtilityClass;
+import org.apache.commons.lang3.StringUtils;
 
 @UtilityClass
 public class Types {
@@ -59,25 +59,32 @@ public class Types {
     }
 
     private static SignatureAttribute.ObjectType toObjectType(TypeName typeName) {
+
         final TypeArgument[] args = typeName.getArguments().stream()
-                .map(Types::toObjectType)
-                .map(TypeArgument::new)
+                .map(tn -> tn.getName().startsWith("?")
+                        ? getWildcardArgument(tn.getName())
+                        : new TypeArgument(toObjectType(tn))
+                )
                 .toArray(TypeArgument[]::new);
 
         if (typeName.getDimension() > 0) {
-            final SignatureAttribute.Type type = typeName.isPrimitive() ? baseType(typeName) : classType(typeName, args);
+            final SignatureAttribute.Type type = typeName.isPrimitive()
+                    ? new SignatureAttribute.BaseType(typeName.getName())
+                    : new ClassType(typeName.getName(), args.length == 0 ? null : args);
             return new ArrayType(typeName.getDimension(), type);
         } else {
-            return classType(typeName, args);
+            return new ClassType(typeName.getName(), args.length == 0 ? null : args);
         }
     }
 
-    private static ClassType classType(TypeName typeName, TypeArgument[] args) {
-        return new ClassType(typeName.getName(), args.length == 0 ? null : args);
-    }
-
-    private static BaseType baseType(TypeName typeName) {
-        return new BaseType(typeName.getName());
+    private TypeArgument getWildcardArgument(String name) {
+        if (name.contains(" extends ")) {
+            return TypeArgument.subclassOf(toObjectType(TypeName.parse(StringUtils.substringAfter(name, "extends "))));
+        } else if (name.contains(" super ")) {
+            return TypeArgument.superOf(toObjectType(TypeName.parse(StringUtils.substringAfter(name, "super "))));
+        } else {
+            return new TypeArgument();
+        }
     }
 
 }

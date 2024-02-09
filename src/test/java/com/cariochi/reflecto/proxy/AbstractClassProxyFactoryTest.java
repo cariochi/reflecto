@@ -1,8 +1,8 @@
 package com.cariochi.reflecto.proxy;
 
+import com.cariochi.reflecto.methods.ReflectoMethod;
+import com.cariochi.reflecto.methods.TargetMethod;
 import com.cariochi.reflecto.proxy.ProxyFactory.MethodHandler;
-import com.cariochi.reflecto.proxy.ProxyFactory.MethodProceed;
-import java.lang.reflect.Method;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 
@@ -26,15 +26,16 @@ class AbstractClassProxyFactoryTest {
     public static class MyMethodHandler implements MethodHandler {
 
         @Override
-        public Object invoke(Object proxy, Method method, Object[] args, MethodProceed proceed) throws Throwable {
-            if (method.getDeclaringClass().equals(Object.class)) {
-                return proceed.proceed();
+        public Object invoke(Object proxy, ReflectoMethod thisMethod, Object[] args, TargetMethod proceed) throws Throwable {
+
+            if (thisMethod.declaringType().actualClass().equals(Object.class)) {
+                return proceed.invoke(args);
             }
 
             if (proceed == null) {
-                return format("You called %s(%s)", method.getName(), Stream.of(args).map(String::valueOf).collect(joining(", ")));
+                return format("You called %s(%s)", thisMethod.name(), Stream.of(args).map(String::valueOf).collect(joining(", ")));
             } else {
-                return proceed.proceed() + "!!!";
+                return proceed.invoke(args) + "!!!";
             }
         }
 

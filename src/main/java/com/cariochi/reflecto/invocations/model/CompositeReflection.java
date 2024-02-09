@@ -1,9 +1,9 @@
-package com.cariochi.reflecto.fields;
+package com.cariochi.reflecto.invocations.model;
 
-import com.cariochi.reflecto.Invocations;
-import com.cariochi.reflecto.Reflection;
-import com.cariochi.reflecto.methods.JavaMethod;
-import com.cariochi.reflecto.methods.Methods;
+import com.cariochi.reflecto.fields.TargetFields;
+import com.cariochi.reflecto.invocations.Invocations;
+import com.cariochi.reflecto.methods.TargetMethods;
+import com.cariochi.reflecto.types.ReflectoType;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.NotImplementedException;
@@ -28,31 +28,26 @@ public class CompositeReflection implements Reflection {
     }
 
     @Override
-    public Reflection get(String path, Object... args) {
-        final Invocations invocations = Invocations.parse(path, args);
+    public Reflection reflect(String expression, Object... args) {
+        final Invocations invocations = Invocations.parse(expression, args);
         final List<Reflection> reflectionsList = reflections.stream()
-                .flatMap(reflection -> invocations.apply(reflection.getValue()).stream())
+                .flatMap(reflection -> invocations.apply(reflection.getValue(), reflection.type()).stream())
                 .collect(toList());
         return new CompositeReflection(reflectionsList);
     }
 
     @Override
-    public Fields fields() {
+    public ReflectoType type() {
         throw new NotImplementedException("Not supported for composite reflection");
     }
 
     @Override
-    public JavaField field(String name) {
+    public TargetFields fields() {
         throw new NotImplementedException("Not supported for composite reflection");
     }
 
     @Override
-    public Methods methods() {
-        throw new NotImplementedException("Not supported for composite reflection");
-    }
-
-    @Override
-    public JavaMethod method(String name, Class<?>... argClasses) {
+    public TargetMethods methods() {
         throw new NotImplementedException("Not supported for composite reflection");
     }
 

@@ -12,7 +12,7 @@ Please, see the recently published documentation [here](https://www.cariochi.com
 <dependency>
     <groupId>com.cariochi.reflecto</groupId>
     <artifactId>reflecto</artifactId>
-    <version>1.1.8</version>
+    <version>1.2.0</version>
 </dependency>
 ```
 
@@ -65,26 +65,26 @@ Bug bug = Bug.builder()
 Get Value
 
 ```java
-String username = reflect(bug)
-        .get("reporter.username")
+String username = Reflecto.reflect(bug)
+        .reflect("reporter.username")
         .getValue();
 ```
 
 ```java
-String username = reflect(bug)
+String username = Reflecto.reflect(bug)
         .invoke("reporter.username");
 ```
 
 Set Value
 
 ```java
-reflect(bug)
-        .get("reporter.username")
+Reflecto.reflect(bug)
+        .reflect("reporter.username")
         .setValue("new_name");
 ```
 
 ```java
-reflect(bug)
+Reflecto.reflect(bug)
         .invoke("reporter.username=?","new_name");
 ```
 
@@ -93,31 +93,31 @@ reflect(bug)
 Get Value
 
 ```java
-String username = reflect(bug)
-        .get("watchers[0].username")
+String username = Reflecto.reflect(bug)
+        .reflect("watchers[0].username")
         .getValue();
 ```
 
 ```java
-String username = reflect(bug)
+String username = Reflecto.reflect(bug)
         .invoke("watchers[0].username");
 ```
 
 Set Value
 
 ```java
-reflect(bug)
-        .get("watchers[0]")
+Reflecto.reflect(bug)
+        .reflect("watchers[0]")
         .setValue(new User("user4"));
 ```
 
 ```java
-reflect(bug)
+Reflecto.reflect(bug)
         .invoke("watchers[0]=?", new User("user4"));
 ```
 
 ```java
-reflect(bug)
+Reflecto.reflect(bug)
         .invoke("watchers[?]=?", 0, new User("user4"));
 ```
 
@@ -126,79 +126,79 @@ reflect(bug)
 Get Value
 
 ```java
-String sprint = reflect(bug)
-        .get("details[Sprint].text")
+String sprint = Reflecto.reflect(bug)
+        .reflect("details[Sprint].text")
         .getValue();
 ```
 
 ```java
-String sprint = reflect(bug)
+String sprint = Reflecto.reflect(bug)
         .invoke("details[Sprint].text");
 ```
 
 Set Value
 
 ```java
-reflect(bug)
-        .get("details[Sprint]")
+Reflecto.reflect(bug)
+        .reflect("details[Sprint]")
         .setValue(new Details("SPR-002"));
 ```
 
 ```java
-reflect(bug)
+Reflecto.reflect(bug)
         .invoke("details[Sprint]=?", new Details("SPR-002"));
 ```
 
 ```java
-reflect(bug)
+Reflecto.reflect(bug)
         .invoke("details[?]=?", "Sprint", new Details("SPR-002"));
 ```
 
 ### Methods
 
 ```java
-String username = reflect(bug)
-        .get("getWatchers().get(?).getUsername()", 0)
+String username = Reflecto.reflect(bug)
+        .reflect("getWatchers().get(?).getUsername()", 0)
         .getValue();
 ```
 
 ```java
-String username = reflect(bug)
+String username = Reflecto.reflect(bug)
         .invoke("getWatchers().get(?).getUsername()", 0);
 ```
 
 ```java
-reflect(bug)
+Reflecto.reflect(bug)
         .invoke("getWatchers().get(?).setUsername(?)", 0, "new_name");
 ```
 ```java
-reflect(bug)
+Reflecto.reflect(bug)
         .invoke("getDetails().remove(?)", "Sprint");
 ```
 
 ```java
-reflect(bug)
+Reflecto.reflect(bug)
         .invoke("getDetails().put(?, ?)", "Sprint", new Details("SPR-002"));
 ```
 
 ### Mixed
 
 ```java
-String username = reflect(bug)
-        .get("watchers[0].getUsername()")
+String username = Reflecto.reflect(bug)
+        .reflect("watchers[0].getUsername()")
         .getValue();
 ```
 ```java
-String username = reflect(bug)
-        .get("getWatchers()[0].getUsername()")
+String username = Reflecto.reflect(bug)
+        .reflect("getWatchers()[0].getUsername()")
         .getValue();
 ```
 ```java
-reflect(bug)
+Reflecto.reflect(bug)
         .invoke("getWatchers().get(?).username=?", 0, "new_name");
 ```
 ```java
-reflect(bug)
+Reflecto.reflect(bug)
         .invoke("details[Sprint].setText(?)", "SPR-002");
 ```
 # License

@@ -2,12 +2,11 @@ package com.cariochi.reflecto;
 
 import com.cariochi.reflecto.model.Bug;
 import com.cariochi.reflecto.model.User;
-import lombok.experimental.UtilityClass;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class TestData {

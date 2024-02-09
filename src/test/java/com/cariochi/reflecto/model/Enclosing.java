@@ -1,30 +1,40 @@
 package com.cariochi.reflecto.model;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Getter
+@RequiredArgsConstructor
 public class Enclosing {
 
-    public Enclosing(String summary) {
-        this.summary = summary;
+    private final String summary;
+
+    @Deprecated
+    private final String deprecatedString = "has been";
+
+    @Deprecated
+    private final int deprecatedInt = -1;
+
+    public First first = new First();
+
+    public String methodFirst() {
+        return "first";
     }
 
-    private String summary;
+    public class First {
 
-    @Deprecated
-    private String deprecatedString = "has been";
+        public Second second = new Second();
 
-    @Deprecated
-    private int deprecatedInt = -1;
+        public class Second {
 
-    public NestedClass nested = new NestedClass();
+            public String third = "third";
 
-    public class NestedClass {
-
-        public SecondNestedClass secondNested = new SecondNestedClass();
-
-        public class SecondNestedClass {
+            public String methodSecond() {
+                return "second";
+            }
 
         }
+
     }
+
 }

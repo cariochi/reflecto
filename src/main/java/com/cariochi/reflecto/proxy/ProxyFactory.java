@@ -1,5 +1,7 @@
 package com.cariochi.reflecto.proxy;
 
+import com.cariochi.reflecto.methods.ReflectoMethod;
+import com.cariochi.reflecto.methods.TargetMethod;
 import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.List;
@@ -9,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 
+import static com.cariochi.reflecto.Reflecto.reflect;
 import static java.util.stream.Collectors.toList;
 
 @UtilityClass
@@ -45,7 +48,7 @@ public class ProxyFactory {
 
     public interface MethodHandler {
 
-        Object invoke(Object proxy, Method method, Object[] args, MethodProceed proceed) throws Throwable;
+        Object invoke(Object proxy, ReflectoMethod thisMethod, Object[] args, TargetMethod proceed) throws Throwable;
 
     }
 
@@ -61,8 +64,9 @@ public class ProxyFactory {
         private final MethodHandler handler;
 
         @Override
-        public Object invoke(Object proxy, Method method, Method proceed, Object[] args) throws Throwable {
-            return handler.invoke(proxy, method, args, proceed == null ? null : () -> proceed.invoke(proxy, args));
+        public Object invoke(Object proxy, Method method, Method proceedMethod, Object[] args) throws Throwable {
+            final TargetMethod methodProceed = proceedMethod == null ? null : reflect(proceedMethod).withTarget(proxy);
+            return handler.invoke(proxy, reflect(method), args, methodProceed);
         }
 
     }

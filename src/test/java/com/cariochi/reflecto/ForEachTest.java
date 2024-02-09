@@ -20,22 +20,22 @@ class ForEachTest {
     void should_invoke_for_each() {
         final Dto dto = dto(1);
 
-        reflect(dto).invoke("array[*].name=?", "TEST");
+        reflect(dto).perform("array[*].name=?", "TEST");
         assertThat(dto.getArray())
                 .extracting(Dto::getName)
                 .containsOnly("TEST");
 
-        reflect(dto).invoke("set[*].name=?", "TEST");
+        reflect(dto).perform("set[*].name=?", "TEST");
         assertThat(dto.getSet())
                 .extracting(Dto::getName)
                 .containsOnly("TEST");
 
-        reflect(dto).invoke("list[*].name=?", "TEST");
+        reflect(dto).perform("list[*].name=?", "TEST");
         assertThat(dto.getList())
                 .extracting(Dto::getName)
                 .containsOnly("TEST");
 
-        reflect(dto).invoke("map[*].name=?", "TEST");
+        reflect(dto).perform("map[*].name=?", "TEST");
         assertThat(dto.getMap().values())
                 .extracting(Dto::getName)
                 .containsOnly("TEST");
@@ -45,19 +45,19 @@ class ForEachTest {
     void should_invoke_for_each_strings() {
         final Dto dto = dto(1);
 
-        reflect(dto).invoke("stringArray[*]=?", "TEST");
+        reflect(dto).perform("stringArray[*]=?", "TEST");
         assertThat(dto.getStringArray())
                 .containsOnly("TEST");
 
-        reflect(dto).invoke("stringSet[*]=?", "TEST");
+        reflect(dto).perform("stringSet[*]=?", "TEST");
         assertThat(dto.getStringSet())
                 .containsOnly("TEST");
 
-        reflect(dto).invoke("stringList[*]=?", "TEST");
+        reflect(dto).perform("stringList[*]=?", "TEST");
         assertThat(dto.getStringList())
                 .containsOnly("TEST");
 
-        reflect(dto).invoke("stringMap[*]=?", "TEST");
+        reflect(dto).perform("stringMap[*]=?", "TEST");
         assertThat(dto.getStringMap().values())
                 .containsOnly("TEST");
     }
@@ -66,26 +66,26 @@ class ForEachTest {
     void should_invoke_for_each_complex() {
         final Dto dto = dto(3);
 
-        reflect(dto).invoke("set[*].set[*].name=?", "TEST");
+        reflect(dto).perform("set[*].set[*].name=?", "TEST");
         assertThat(dto.getSet())
                 .flatExtracting(Dto::getSet)
                 .extracting(Dto::getName)
                 .containsOnly("TEST");
 
-        reflect(dto).invoke("map[*].set[*].name=?", "TEST");
+        reflect(dto).perform("map[*].set[*].name=?", "TEST");
         assertThat(dto.getMap().values())
                 .flatExtracting(Dto::getSet)
                 .extracting(Dto::getName)
                 .containsOnly("TEST");
 
-        reflect(dto).invoke("list[*].map[*].name=?", "TEST");
+        reflect(dto).perform("list[*].map[*].name=?", "TEST");
         assertThat(dto.getList())
                 .extracting(Dto::getMap)
                 .flatExtracting(Map::values)
                 .extracting(Dto::getName)
                 .containsOnly("TEST");
 
-        reflect(dto).invoke("list[?].map[?].stringMap[*]=?", 0, "one", "TEST");
+        reflect(dto).perform("list[?].map[?].stringMap[*]=?", 0, "one", "TEST");
         assertThat(dto.getList().get(0).getMap().get("one").getStringMap().values())
                 .containsOnly("TEST");
     }
@@ -95,12 +95,12 @@ class ForEachTest {
     void should_invoke_for_each_in_list() {
         final List<Dto> dtos = List.of(dto(1), dto(1));
 
-        reflect(dtos).invoke("[*].name = ?", "TEST");
+        reflect(dtos).perform("[*].name = ?", "TEST");
         assertThat(dtos)
                 .extracting(Dto::getName)
                 .containsOnly("TEST");
 
-        reflect(dtos).invoke("[*].list[*].name=?", "TEST");
+        reflect(dtos).perform("[*].list[*].name=?", "TEST");
         assertThat(dtos)
                 .flatExtracting(Dto::getList)
                 .extracting(Dto::getName)
@@ -111,8 +111,8 @@ class ForEachTest {
     void should_get_for_each() {
         final Dto dto = dto(3);
 
-        reflect(dto).get("set[*]").get("set[*]").invoke("name=?", "TEST");
-        assertThat(reflect(dto).get("set[*].set[*].name").<List<String>>getValue())
+        reflect(dto).reflect("set[*]").reflect("set[*]").perform("name=?", "TEST");
+        assertThat(reflect(dto).reflect("set[*].set[*].name").<List<String>>getValue())
                 .hasSize(4)
                 .containsOnly("TEST");
     }
@@ -121,7 +121,7 @@ class ForEachTest {
     void should_get_null() {
         final Dto dto = dto(1);
 
-        final List<Object> value = reflect(dto).invoke("set[*].set[*].name");
+        final List<Object> value = reflect(dto).perform("set[*].set[*].name");
         assertThat(value).containsOnlyNulls();
     }
 
