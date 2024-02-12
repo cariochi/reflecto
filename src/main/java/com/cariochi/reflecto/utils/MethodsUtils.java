@@ -1,5 +1,6 @@
 package com.cariochi.reflecto.utils;
 
+import com.cariochi.reflecto.fields.ReflectoField;
 import com.cariochi.reflecto.methods.ReflectoMethod;
 import com.cariochi.reflecto.parameters.ReflectoParameter;
 import com.cariochi.reflecto.types.ReflectoType;
@@ -33,8 +34,32 @@ public class MethodsUtils {
                 .findFirst();
     }
 
-    public static List<ReflectoMethod> getMethods(ReflectoType type) {
-        return new ArrayList<>(collectMethods(type).values());
+    private static Class<?>[] getActualParameterTypes(ReflectoMethod method) {
+        return method.parameters().stream().map(ReflectoParameter::type).map(ReflectoType::actualClass).toArray(Class[]::new);
+    }
+
+    private static int distance(Class<?>[] fromClassArray, Class<?>[] toClassArray) {
+        return range(0, fromClassArray.length)
+                .map(i -> {
+                    final Class<?> fromClass = fromClassArray[i];
+                    final Class<?> toClass = toClassArray[i];
+                    return fromClass == null || fromClass.equals(toClass)
+                            ? 0
+                            : (isAssignable(fromClass, toClass, true) && !isAssignable(fromClass, toClass, false) ? 1 : 2);
+                })
+                .sum();
+    }
+
+    public static List<ReflectoMethod> collectMethods(ReflectoType declaringType, boolean includeEnclosing) {
+        final List<ReflectoMethod> methods = new ArrayList<>(collectMethods(declaringType).values());
+        if (includeEnclosing) {
+            Stream.of(declaringType.actualClass().getDeclaredFields())
+                    .map(field -> new ReflectoField(field, declaringType))
+                    .map(MethodsUtils::getEnclosingMethods)
+                    .flatMap(List::stream)
+                    .forEach(methods::add);
+        }
+        return methods;
     }
 
     private static Map<MethodSignature, ReflectoMethod> collectMethods(ReflectoType type) {
@@ -72,20 +97,22 @@ public class MethodsUtils {
         });
     }
 
-    private static Class<?>[] getActualParameterTypes(ReflectoMethod method) {
-        return method.parameters().stream().map(ReflectoParameter::type).map(ReflectoType::actualClass).toArray(Class[]::new);
-    }
+    private static List<ReflectoMethod> getEnclosingMethods(ReflectoField syntheticField) {
+        final ArrayList<ReflectoMethod> enclosingMethods = new ArrayList<>();
 
-    private static int distance(Class<?>[] fromClassArray, Class<?>[] toClassArray) {
-        return range(0, fromClassArray.length)
-                .map(i -> {
-                    final Class<?> fromClass = fromClassArray[i];
-                    final Class<?> toClass = toClassArray[i];
-                    return fromClass == null || fromClass.equals(toClass)
-                            ? 0
-                            : (isAssignable(fromClass, toClass, true) && !isAssignable(fromClass, toClass, false) ? 1 : 2);
-                })
-                .sum();
+        syntheticField.type().methods().stream()
+                .peek(f -> f.syntheticParent(syntheticField))
+                .forEach(enclosingMethods::add);
+
+        Stream.of(syntheticField.type().actualClass().getDeclaredFields())
+                .map(field -> new ReflectoField(field, syntheticField.type()))
+                .filter(ReflectoField::isSynthetic)
+                .peek(field -> field.syntheticParent(syntheticField))
+                .map(MethodsUtils::getEnclosingMethods)
+                .flatMap(List::stream)
+                .forEach(enclosingMethods::add);
+
+        return enclosingMethods;
     }
 
     @Value

@@ -20,7 +20,7 @@ import static org.apache.commons.lang3.StringUtils.substringBefore;
 @Getter
 @EqualsAndHashCode
 @NoArgsConstructor(access = PRIVATE)
-public class TypeName {
+class TypeName {
 
     private static final Set<String> PRIMITIVE_TYPES = Set.of("byte", "short", "int", "long", "float", "double", "char", "boolean");
 

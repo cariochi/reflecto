@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import static com.cariochi.reflecto.Reflecto.reflect;
 import static com.cariochi.reflecto.TestData.bug;
+import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
@@ -29,9 +30,9 @@ class TargetMethodsTest {
     void should_get_methods_with_annotation() {
         final List<TargetMethod> methods = reflect(bug())
                 .reflect("watchers[0]")
-                .methods()
-                .withAnnotation(Id.class)
-                .list();
+                .methods().stream()
+                .filter(method -> method.annotations().contains(Id.class))
+                .collect(toList());
 
         assertThat(methods)
                 .extracting(TargetMethod::name, method -> method.returnType().actualType())

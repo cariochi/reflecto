@@ -4,7 +4,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
+import java.util.function.Supplier;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
@@ -15,22 +15,13 @@ import static java.util.Arrays.asList;
 @Accessors(fluent = true)
 public class ReflectoAnnotations implements Streamable<Annotation> {
 
-    private final Function<Boolean, List<Annotation>> annotationSupplier;
-
-    private final boolean declared;
+    private final Supplier<List<Annotation>> listSupplier;
 
     @Getter(lazy = true)
-    private final List<Annotation> list = annotationSupplier.apply(declared);
+    private final List<Annotation> list = listSupplier.get();
 
     public ReflectoAnnotations(AnnotatedElement element) {
-        this(
-                declared -> declared ? asList(element.getDeclaredAnnotations()) : asList(element.getAnnotations()),
-                false
-        );
-    }
-
-    public ReflectoAnnotations declared() {
-        return new ReflectoAnnotations(annotationSupplier, true);
+        this(() -> asList(element.getAnnotations()));
     }
 
     public <A extends Annotation> Optional<A> find(Class<A> annotationClass) {

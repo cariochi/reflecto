@@ -32,6 +32,9 @@ public class ReflectoMethod implements IsMethod {
 
     private final Set<ReflectoMethod> superMethods = new HashSet<>();
 
+    @Getter
+    private final Declared declared = new Declared();
+
     @Setter
     private ReflectoField syntheticParent;
 
@@ -58,7 +61,7 @@ public class ReflectoMethod implements IsMethod {
 
     @Override
     public ReflectoAnnotations annotations() {
-        return new ReflectoAnnotations(declared -> declared ? asList(rawMethod().getDeclaredAnnotations()) : collectAnnotations(), false);
+        return new ReflectoAnnotations(this::collectAnnotations);
     }
 
     private List<Annotation> collectAnnotations() {
@@ -68,6 +71,13 @@ public class ReflectoMethod implements IsMethod {
                 .map(m -> m.collectAnnotations())
                 .forEach(annotations::addAll);
         return annotations;
+    }
+
+    public class Declared {
+
+        @Getter(lazy = true)
+        private final ReflectoAnnotations annotations = new ReflectoAnnotations(() ->  asList(rawMethod().getDeclaredAnnotations()));
+
     }
 
     @Override

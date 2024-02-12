@@ -16,6 +16,7 @@ class ReflectoConstructorsTest {
     @Test
     void test() {
         final ReflectoType reflectoType = reflect(Types.type(ArrayList.class, String.class));
+
         final ReflectoConstructors constructors = reflectoType.constructors();
         assertThat(constructors.list()).hasSize(3);
         final ReflectoConstructor constructor = constructors.find(Collection.class).orElseThrow();

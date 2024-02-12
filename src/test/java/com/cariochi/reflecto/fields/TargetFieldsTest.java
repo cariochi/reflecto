@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import static com.cariochi.reflecto.Reflecto.reflect;
 import static com.cariochi.reflecto.TestData.bug;
+import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
@@ -106,9 +107,9 @@ class TargetFieldsTest {
     void should_get_fields_with_type() {
         final List<TargetField> fields = reflect(bug())
                 .reflect("getWatchers().get(?)", 0)
-                .fields()
-                .withType(String.class)
-                .list();
+                .fields().stream()
+                .filter(field -> field.type().is(String.class))
+                .collect(toList());
 
         assertThat(fields)
                 .hasSize(1)
@@ -120,9 +121,9 @@ class TargetFieldsTest {
     void should_get_fields_with_annotation() {
         final List<TargetField> fields = reflect(bug())
                 .reflect("getWatchers().get(?)", 0)
-                .fields()
-                .withAnnotation(Id.class)
-                .list();
+                .fields().stream()
+                .filter(field -> field.annotations().contains(Id.class))
+                .collect(toList());
 
         assertThat(fields)
                 .hasSize(1)
@@ -134,10 +135,10 @@ class TargetFieldsTest {
     void should_get_fields_with_type_and_annotation() {
         final List<TargetField> fields = reflect(bug())
                 .reflect("getWatchers().get(?)", 0)
-                .fields()
-                .withType(Integer.class)
-                .withAnnotation(Id.class)
-                .list();
+                .fields().stream()
+                .filter(field -> field.type().is(Integer.class))
+                .filter(field -> field.annotations().contains(Id.class))
+                .collect(toList());
 
         assertThat(fields)
                 .hasSize(1)

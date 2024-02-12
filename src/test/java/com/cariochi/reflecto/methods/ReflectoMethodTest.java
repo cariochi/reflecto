@@ -28,10 +28,10 @@ class ReflectoMethodTest {
     void should_find_with_annotation() {
         final Type type = Types.type(Child.class, String.class);
         final ReflectoMethods methods = reflect(type).methods();
-        assertThat(methods.withAnnotation(Id.class).list()).isNotEmpty();
-        assertThat(methods.withDeclaredAnnotation(Id.class).list()).isEmpty();
-        assertThat(methods.withAnnotation(Name.class).list()).isNotEmpty();
-        assertThat(methods.withDeclaredAnnotation(Name.class).list()).isNotEmpty();
+        assertThat(methods.stream().filter(method -> method.annotations().contains(Id.class))).isNotEmpty();
+        assertThat(methods.stream().filter(method -> method.declared().annotations().contains(Id.class))).isEmpty();
+        assertThat(methods.stream().filter(method -> method.annotations().contains(Name.class))).isNotEmpty();
+        assertThat(methods.stream().filter(method -> method.declared().annotations().contains(Name.class))).isNotEmpty();
     }
 
     private static class Super<T> implements Interface<T>, Interface2<T> {

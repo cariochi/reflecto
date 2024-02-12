@@ -12,10 +12,23 @@ import javassist.bytecode.SignatureAttribute.ClassType;
 import javassist.bytecode.SignatureAttribute.TypeArgument;
 import javassist.util.proxy.ProxyFactory;
 import lombok.experimental.UtilityClass;
-import org.apache.commons.lang3.StringUtils;
+
+import static org.apache.commons.lang3.StringUtils.substringAfter;
 
 @UtilityClass
 public class Types {
+
+    public static Type any() {
+        return type("?");
+    }
+
+    public static Type anyExtends(Type type) {
+        return type("? extends " + type.getTypeName());
+    }
+
+    public static Type anySuper(Type type) {
+        return type("? super " + type.getTypeName());
+    }
 
     public static Type listOf(Type type) {
         return type(List.class, type);
@@ -41,7 +54,7 @@ public class Types {
         return type(TypeName.parse(typeName));
     }
 
-    public static Type type(TypeName typeName) {
+    private static Type type(TypeName typeName) {
         return type(classSignature(typeName));
     }
 
@@ -79,9 +92,9 @@ public class Types {
 
     private TypeArgument getWildcardArgument(String name) {
         if (name.contains(" extends ")) {
-            return TypeArgument.subclassOf(toObjectType(TypeName.parse(StringUtils.substringAfter(name, "extends "))));
+            return TypeArgument.subclassOf(toObjectType(TypeName.parse(substringAfter(name, "extends "))));
         } else if (name.contains(" super ")) {
-            return TypeArgument.superOf(toObjectType(TypeName.parse(StringUtils.substringAfter(name, "super "))));
+            return TypeArgument.superOf(toObjectType(TypeName.parse(substringAfter(name, "super "))));
         } else {
             return new TypeArgument();
         }

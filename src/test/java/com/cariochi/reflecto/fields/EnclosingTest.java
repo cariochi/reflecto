@@ -19,7 +19,7 @@ public class EnclosingTest {
 
         @Test
         void should_get_enclosing_fields() {
-            final TargetFields fields = reflect(enclosing.first.second).fields().includeEnclosing();
+            final TargetFields fields = reflect(enclosing.first.second).includeEnclosing().fields();
             assertThat(fields.list())
                     .extracting(TargetField::name, TargetField::getValue)
                     .containsExactlyInAnyOrder(
@@ -36,13 +36,16 @@ public class EnclosingTest {
             final TargetFields fields = reflect(enclosing.first.second).fields();
             assertThat(fields.list())
                     .extracting(TargetField::name, TargetField::getValue)
-                    .containsExactly(tuple("third", enclosing.first.second.third));
+                    .containsExactlyInAnyOrder(
+                            tuple("third", enclosing.first.second.third),
+                            tuple("this$1", enclosing.first)
+                    );
         }
 
         @Test
         void should_get_enclosing_fields_with_annotation() {
-            final TargetFields fields = reflect(enclosing.first.second).fields().includeEnclosing();
-            assertThat(fields.withAnnotation(Deprecated.class).list())
+            final TargetFields fields = reflect(enclosing.first.second).includeEnclosing().fields();
+            assertThat(fields.stream().filter(field -> field.annotations().contains(Deprecated.class)))
                     .extracting(TargetField::name, TargetField::getValue)
                     .containsExactlyInAnyOrder(
                             tuple("deprecatedString", "has been"),
@@ -51,8 +54,8 @@ public class EnclosingTest {
 
         @Test
         void should_get_enclosing_fields_with_type() {
-            final TargetFields fields = reflect(enclosing.first.second).fields().includeEnclosing();
-            assertThat(fields.withType(String.class).list())
+            final TargetFields fields = reflect(enclosing.first.second).includeEnclosing().fields();
+            assertThat(fields.stream().filter(field -> field.type().is(String.class)))
                     .extracting(TargetField::name, TargetField::getValue)
                     .containsExactlyInAnyOrder(
                             tuple("summary", "bla bla"),
@@ -63,8 +66,8 @@ public class EnclosingTest {
 
         @Test
         void should_get_enclosing_class_field_with_type_and_annotation() {
-            final TargetFields fields = reflect(enclosing.first.second).fields().includeEnclosing();
-            assertThat(fields.withType(String.class).withAnnotation(Deprecated.class).list())
+            final TargetFields fields = reflect(enclosing.first.second).includeEnclosing().fields();
+            assertThat(fields.stream().filter(field -> field.type().is(String.class)).filter(field -> field.annotations().contains(Deprecated.class)))
                     .extracting(TargetField::name, TargetField::getValue)
                     .containsExactly(tuple("deprecatedString", "has been"));
         }
@@ -76,7 +79,7 @@ public class EnclosingTest {
 
         @Test
         void should_get_enclosing_methods() {
-            final TargetMethods methods = reflect(enclosing.first.second).methods().includeEnclosing();
+            final TargetMethods methods = reflect(enclosing.first.second).includeEnclosing().methods();
             assertThat(methods.find("methodFirst()"))
                     .map(TargetMethod::invoke)
                     .contains("first");
