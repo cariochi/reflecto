@@ -8,7 +8,7 @@ Please, see the recently published documentation [here](https://www.cariochi.com
 
 # Maven dependency
 
-```markup
+```xml
 <dependency>
     <groupId>com.cariochi.reflecto</groupId>
     <artifactId>reflecto</artifactId>
