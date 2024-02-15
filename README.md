@@ -11,7 +11,7 @@ Reflecto is a powerful Java Reflection Library designed to simplify deep reflect
 - Advanced type checking and operations
 - Support for lists/arrays, maps, and method invocations
 
-# Installation
+## Installation
 Include Reflecto in your project by adding it as a dependency in your build tool. For Maven:
 
 ```xml
@@ -22,13 +22,13 @@ Include Reflecto in your project by adding it as a dependency in your build tool
 </dependency>
 ```
 
-# Usage
+## Documentation
 
 Please, see the recently published documentation **[here](https://www.cariochi.com/reflecto).**
 
-# Examples
+## Usage
 
-## Type Creation
+### Type Creation
 
 ```java
 // MyType<String, Long>
@@ -72,9 +72,9 @@ Type complexTypeByName = Types.type("java.util.List<java.util.function.Supplier<
 
 ```
 
-## Reflecting Types
+### Reflecting Types
 
-### Inspecting Types
+#### Inspecting Types
 ```java
 // Example class
 public static class Dto<T> {
@@ -111,7 +111,7 @@ assertThat(reflectoType.reflect("child.map[1][0].value").actualType()).isEqualTo
 
 ```
 
-### Constructors
+#### Constructors
 ```java
 ReflectoType type = reflect(Types.type(ArrayList.class, String.class));
 
@@ -126,7 +126,7 @@ ReflectoConstructor constructor = type.constructors()
 Object instance = constructor.newInstance(Set.of(1));
 ```
 
-### Methods
+#### Methods
 ```java
 // lists methods
 List<ReflectoMethod> methods = type.methods().list();
@@ -152,7 +152,7 @@ TargetMethod staticMethod = method.asStatic();
 String result = staticMethod.invoke("World");
 ```
 
-### Fields
+#### Fields
 ```java
 // list fields
 List<ReflectoField> fields = type.fields().list();
@@ -183,7 +183,7 @@ staticField.
 setValue("New Name");
 ```
 
-### Working with Arrays and Enums
+#### Working with Arrays and Enums
 ```java
 ReflectoType arrayType = Reflecto.reflect(String[].class);
 boolean isArray = arrayType.isArray();
@@ -194,7 +194,7 @@ boolean isEnum = enumTypee.isEnum();
 List<Object> enumType = enumType.asEnum().constants();
 ```
 
-### Methods for Type Checking
+#### Methods for Type Checking
 ```java
 ReflectoType type = Reflecto.reflect(Types.listOf(String.class));
 
@@ -211,9 +211,9 @@ assertThat(type.isAssignableFrom(Types.type(ArrayList.class, Long.class))).isFal
 assertThat(type.isInstance(new ArrayList<>())).isTrue();
 ```
 
-## Reflecting Objects
+### Reflecting Objects
 
-### Initial Object for Examples
+#### Initial Object for Examples
 ```java
 Bug bug = Bug.builder()
         .id(1)
@@ -230,7 +230,7 @@ Bug bug = Bug.builder()
         .build();
 ```
 
-### Methods
+#### Methods
 ```java
 List<TargetMethod> methods = Reflecto.reflect(bug).methods().list();
 
@@ -243,7 +243,7 @@ Reflecto.reflect(bug).methods().find("setReporter(?)", User.class)
     .ifPresent(method -> method.invoke(reporter));    
 ```
 
-### Fields
+#### Fields
 ```java
 List<TargetField> fields = Reflecto.reflect(bug).fields().list();
 
@@ -256,7 +256,7 @@ Reflecto.reflect(bug).fields().find("reporter")
     .ifPresent(field -> field.setValue(reporter));
 ```
 
-### Simple Field Access and Modification
+#### Simple Field Access and Modification
 ```java
 // Getting Value
 
@@ -276,7 +276,7 @@ Reflecto.reflect(bug)
 Reflecto.reflect(bug)
         .invoke("reporter.username=?", "new_name");
 ```
-### Working with Lists/Arrays
+#### Working with Lists/Arrays
 ```java
 // Getting Value
 
@@ -311,7 +311,7 @@ Reflecto.reflect(bug)
         .invoke("watchers[?]=?", 0, new User("user4"));
 ```
 
-### Working with Maps
+#### Working with Maps
 ```java
 // Getting Value
 
@@ -346,7 +346,7 @@ Reflecto.reflect(bug)
         .invoke("details[?]=?", "Sprint", new Details("SPR-002"));
 ```
 
-### Invoking Methods
+#### Invoking Methods
 ```java
 String username = Reflecto.reflect(bug)
         .reflect("getWatchers().get(?).getUsername()", 0)
@@ -362,7 +362,7 @@ Reflecto.reflect(bug)
         .invoke("getDetails().put(?, ?)", "Sprint", new Details("SPR-002"));
 ```
 
-### Mixed Usage
+#### Mixed Usage
 ```java
 String username = Reflecto.reflect(bug)
         .reflect("watchers[0].getUsername()")
@@ -390,6 +390,6 @@ Reflecto.reflect(bug)
         .invoke("details[?].setText(?)", "Sprint", "SPR-002");
 ```
 
-# License
+## License
 
 **Reflecto** library is licensed under the [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0). 
