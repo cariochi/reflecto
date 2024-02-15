@@ -203,130 +203,183 @@ assertThat(type.isInstance(new ArrayList<>())).isTrue();
 
 ## Reflecting Objects
 
+### Initial Object for Examples
 ```java
-import static com.cariochi.reflecto.Reflecto;
-
-// Getting Field Value
-
-String username = Reflecto.reflect(bug)
-    .reflect("reporter.username")
-    .getValue();
-
-String username = Reflecto.reflect(bug)
-    .invoke("reporter.username");
-
-// Setting Field Value
-
-Reflecto.reflect(bug)
-    .reflect("reporter.username")
-    .setValue("new_name");
-
-Reflecto.reflect(bug)
-    .invoke("reporter.username=?", "new_name");
-
-// Working with Lists/Arrays
-
-String username = Reflecto.reflect(bug)
-    .reflect("watchers[0].username")
-    .getValue();
-
-String username = Reflecto.reflect(bug)
-    .reflect("watchers[?].username", 0)
-    .getValue();
-
-String username = Reflecto.reflect(bug)
-    .invoke("watchers[0].username");
-
-String username = Reflecto.reflect(bug)
-    .invoke("watchers[?].username", 0);
-
-Reflecto.reflect(bug)
-    .reflect("watchers[0]")
-    .setValue(new User("user4"));
-
-Reflecto.reflect(bug)
-    .reflect("watchers[?]", 0)
-    .setValue(new User("user4"));
-
-Reflecto.reflect(bug)
-    .invoke("watchers[0]=?", new User("user4"));
-
-Reflecto.reflect(bug)
-    .invoke("watchers[?]=?", 0, new User("user4"));
-
-// Working with Maps
-
-String sprint = Reflecto.reflect(bug)
-    .reflect("details[Sprint].text")
-    .getValue();
-
-String sprint = Reflecto.reflect(bug)
-    .reflect("details[?].text", "Sprint")
-    .getValue();
-
-String sprint = Reflecto.reflect(bug)
-    .invoke("details[Sprint].text");
-
-String sprint = Reflecto.reflect(bug)
-    .invoke("details[?].text", "Sprint");  
-
-Reflecto.reflect(bug)
-    .reflect("details[Sprint]")
-    .setValue(new Details("SPR-002"));
-
-Reflecto.reflect(bug)
-    .reflect("details[?]", "Sprint")
-    .setValue(new Details("SPR-002"));
-
-Reflecto.reflect(bug)
-    .invoke("details[Sprint]=?", new Details("SPR-002"));
-
-Reflecto.reflect(bug)
-    .invoke("details[?]=?", "Sprint", new Details("SPR-002"));
-
-// Invoking Methods
-
-String username = Reflecto.reflect(bug)
-    .reflect("getWatchers().get(?).getUsername()", 0)
-    .getValue();
-
-Reflecto.reflect(bug)
-    .invoke("getWatchers().get(?).setUsername(?)", 0, "new_name");
-        
-Reflecto.reflect(bug)
-    .invoke("getDetails().remove(?)", "Sprint");
-        
-Reflecto.reflect(bug)
-    .invoke("getDetails().put(?, ?)", "Sprint", new Details("SPR-002"));
-
-// Mixed Usage
-
-String username = Reflecto.reflect(bug)
-    .reflect("watchers[0].getUsername()")
-    .getValue();
-
-String username = Reflecto.reflect(bug)
-    .reflect("watchers[?].getUsername()", 0)
-    .getValue();
-
-String username = Reflecto.reflect(bug)
-    .reflect("getWatchers()[0].getUsername()")
-    .getValue();
-
-String username = Reflecto.reflect(bug)
-    .reflect("getWatchers()[?].getUsername()", 0)
-    .getValue();
-
-Reflecto.reflect(bug)
-    .invoke("getWatchers().get(?).username=?", 0, "new_name");
-        
-Reflecto.reflect(bug)
-    .invoke("details[Sprint].setText(?)", "SPR-002");
-        
-Reflecto.reflect(bug)
-    .invoke("details[?].setText(?)", "Sprint", "SPR-002");
-
+Bug bug = Bug.builder()
+        .id(1)
+        .summary("Invalid value")
+        .reporter(new User(100, "qa"))
+        .watchers(new ArrayList<>(List.of(
+                new User(101, "developer"),
+                new User(102, "manager")
+        )))
+        .details(new HashMap<>(Map.of(
+                "Sprint", "SPR-001",
+                "Component", "Authorization"
+        )))
+        .build();
 ```
+
+### Methods
+```java
+List<TargetMethod> methods = Reflecto.reflect(bug).methods().list();
+
+User reporter = Reflecto.reflect(bug).methods().find("getReporter()")
+    .map(TargetMethod::invoke)
+    .map(User.class::cast)
+    .orElseThrow();
+    
+Reflecto.reflect(bug).methods().find("setReporter(?)", User.class)
+    .ifPresent(method -> method.invoke(reporter));    
+```
+
+### Fields
+```java
+List<TargetField> fields = Reflecto.reflect(bug).fields().list();
+
+User reporter = Reflecto.reflect(bug).fields().find("reporter")
+    .map(TargetField::getValue)
+    .map(User.class::cast)
+    .orElseThrow();
+    
+Reflecto.reflect(bug).fields().find("reporter")
+    .ifPresent(field -> field.setValue(reporter));
+```
+
+### Simple Field Access and Modification
+```java
+// Getting Value
+
+String username = Reflecto.reflect(bug)
+        .reflect("reporter.username")
+        .getValue();
+
+String username = Reflecto.reflect(bug)
+        .invoke("reporter.username");
+        
+// Setting Value
+
+Reflecto.reflect(bug)
+        .reflect("reporter.username")
+        .setValue("new_name");
+
+Reflecto.reflect(bug)
+        .invoke("reporter.username=?", "new_name");
+```
+### Working with Lists/Arrays
+```java
+// Getting Value
+
+String username = Reflecto.reflect(bug)
+        .reflect("watchers[0].username")
+        .getValue();
+
+String username = Reflecto.reflect(bug)
+        .reflect("watchers[?].username", 0)
+        .getValue();
+        
+String username = Reflecto.reflect(bug)
+        .invoke("watchers[0].username");
+        
+String username = Reflecto.reflect(bug)
+        .invoke("watchers[?].username", 0);
+        
+// Setting Value
+
+Reflecto.reflect(bug)
+        .reflect("watchers[0]")
+        .setValue(new User("user4"));
+
+Reflecto.reflect(bug)
+        .reflect("watchers[?]", 0)
+        .setValue(new User("user4"));
+        
+Reflecto.reflect(bug)
+        .invoke("watchers[0]=?", new User("user4"));
+        
+Reflecto.reflect(bug)
+        .invoke("watchers[?]=?", 0, new User("user4"));
+```
+
+### Working with Maps
+```java
+// Getting Value
+
+String sprint = Reflecto.reflect(bug)
+        .reflect("details[Sprint].text")
+        .getValue();
+        
+String sprint = Reflecto.reflect(bug)
+        .reflect("details[?].text", "Sprint")
+        .getValue();
+        
+String sprint = Reflecto.reflect(bug)
+        .invoke("details[Sprint].text");
+        
+String sprint = Reflecto.reflect(bug)
+        .invoke("details[?].text", "Sprint");
+        
+// Setting Value
+
+Reflecto.reflect(bug)
+        .reflect("details[Sprint]")
+        .setValue(new Details("SPR-002"));
+
+Reflecto.reflect(bug)
+        .reflect("details[?]", "Sprint")
+        .setValue(new Details("SPR-002"));
+        
+Reflecto.reflect(bug)
+        .invoke("details[Sprint]=?", new Details("SPR-002"));
+        
+Reflecto.reflect(bug)
+        .invoke("details[?]=?", "Sprint", new Details("SPR-002"));
+```
+
+### Invoking Methods
+```java
+String username = Reflecto.reflect(bug)
+        .reflect("getWatchers().get(?).getUsername()", 0)
+        .getValue();
+
+Reflecto.reflect(bug)
+        .invoke("getWatchers().get(?).setUsername(?)", 0, "new_name");
+        
+Reflecto.reflect(bug)
+        .invoke("getDetails().remove(?)", "Sprint");
+        
+Reflecto.reflect(bug)
+        .invoke("getDetails().put(?, ?)", "Sprint", new Details("SPR-002"));
+```
+
+### Mixed Usage
+```java
+String username = Reflecto.reflect(bug)
+        .reflect("watchers[0].getUsername()")
+        .getValue();
+
+String username = Reflecto.reflect(bug)
+        .reflect("watchers[?].getUsername()", 0)
+        .getValue();
+        
+String username = Reflecto.reflect(bug)
+        .reflect("getWatchers()[0].getUsername()")
+        .getValue();
+        
+String username = Reflecto.reflect(bug)
+        .reflect("getWatchers()[?].getUsername()", 0)
+        .getValue();
+
+Reflecto.reflect(bug)
+        .invoke("getWatchers().get(?).username=?", 0, "new_name");
+        
+Reflecto.reflect(bug)
+        .invoke("details[Sprint].setText(?)", "SPR-002");
+        
+Reflecto.reflect(bug)
+        .invoke("details[?].setText(?)", "Sprint", "SPR-002");
+```
+
 # License
 
 **Reflecto** library is licensed under the [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0). 
