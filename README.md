@@ -2,11 +2,17 @@
 
 Java Deep Reflection Library
 
-# Documentation
+## Introduction
+Reflecto is a powerful Java Reflection Library designed to simplify deep reflection tasks. It enables developers to easily interact with Java types, constructors, methods, and fields through a clean and intuitive API.
 
-Please, see the recently published documentation **[here](https://www.cariochi.com/reflecto).** 
+## Features
+- Type creation and inspection
+- Simplified access to constructors, methods, and fields
+- Advanced type checking and operations
+- Support for lists/arrays, maps, and method invocations
 
-# Maven dependency
+# Installation
+Include Reflecto in your project by adding it as a dependency in your build tool. For Maven:
 
 ```xml
 <dependency>
@@ -15,6 +21,10 @@ Please, see the recently published documentation **[here](https://www.cariochi.c
     <version>1.2.0</version>
 </dependency>
 ```
+
+# Usage
+
+Please, see the recently published documentation **[here](https://www.cariochi.com/reflecto).**
 
 # Examples
 
