@@ -36,7 +36,7 @@ public class ReflectoConstructor {
     private final ReflectoExceptionTypes exceptions = new ReflectoExceptionTypes(constructor, declaringType);
 
 
-    public Constructor<?> asConstructor() {
+    public Constructor<?> rawConstructor() {
         return constructor;
     }
 
