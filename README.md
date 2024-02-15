@@ -18,7 +18,7 @@ Please, see the recently published documentation [here](https://www.cariochi.com
 
 # Examples
 
-##Type Creation
+## Type Creation
 
 ```java
 // MyType<String, Long>
