@@ -4,7 +4,7 @@ Java Deep Reflection Library
 
 # Documentation
 
-Please, see the recently published documentation [here](https://www.cariochi.com/reflecto). 
+Please, see the recently published documentation **[here](https://www.cariochi.com/reflecto).** 
 
 # Maven dependency
 
