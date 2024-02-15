@@ -18,12 +18,14 @@ class TypeReflectionTest {
 
         final Type type = type(Dto.class, Integer.class);
 
-        assertThat(reflect(type).reflect("value").actualType()).isEqualTo(Integer.class);
-        assertThat(reflect(type).reflect("child.value").actualType()).isEqualTo(Integer.class);
-        assertThat(reflect(type).reflect("child.map[0]").actualType()).isEqualTo(String.class);
-        assertThat(reflect(type).reflect("set[0].value").actualType()).isEqualTo(Integer.class);
-        assertThat(reflect(type).reflect("child.map[1][0]").actualType()).isEqualTo(type);
-        assertThat(reflect(type).reflect("child.map[1][0].value").actualType()).isEqualTo(Integer.class);
+        final ReflectoType reflectoType = reflect(type);
+        assertThat(reflectoType.arguments().get(0).actualType()).isEqualTo(Integer.class);
+        assertThat(reflectoType.reflect("value").actualType()).isEqualTo(Integer.class);
+        assertThat(reflectoType.reflect("child.value").actualType()).isEqualTo(Integer.class);
+        assertThat(reflectoType.reflect("child.map[0]").actualType()).isEqualTo(String.class);
+        assertThat(reflectoType.reflect("set[0][0]").actualType()).isEqualTo(Integer.class);
+        assertThat(reflectoType.reflect("child.map[1][0]").actualType()).isEqualTo(type);
+        assertThat(reflectoType.reflect("child.map[1][0].value").actualType()).isEqualTo(Integer.class);
 
     }
 

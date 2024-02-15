@@ -27,7 +27,7 @@ class StaticInvokeTest {
     @Test
     void should_invoke_static_method() {
         final ReflectoType type = Reflecto.reflect(Dto.class);
-        final TargetMethod staticMethod = type.methods().find("sayHello", String.class).map(ReflectoMethod::asStatic).orElseThrow();
+        final TargetMethod staticMethod = type.methods().find("sayHello(?)", String.class).map(ReflectoMethod::asStatic).orElseThrow();
 
         final String result = staticMethod.invoke("World");
         assertThat(result)
