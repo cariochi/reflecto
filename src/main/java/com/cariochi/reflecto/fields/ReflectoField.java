@@ -3,6 +3,7 @@ package com.cariochi.reflecto.fields;
 import com.cariochi.reflecto.base.IsField;
 import com.cariochi.reflecto.types.ReflectoType;
 import java.lang.reflect.Field;
+import java.util.function.Supplier;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +21,10 @@ public class ReflectoField implements IsField {
     @EqualsAndHashCode.Include
     private final Field rawField;
 
-    private final ReflectoType declaringType;
+    private final Supplier<ReflectoType> declaringTypeSupplier;
+
+    @Getter(lazy = true)
+    private final ReflectoType declaringType = declaringTypeSupplier.get();
 
     @Setter
     private ReflectoField syntheticParent;

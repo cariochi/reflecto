@@ -2,7 +2,6 @@ package com.cariochi.reflecto.utils;
 
 import com.cariochi.reflecto.fields.ReflectoField;
 import com.cariochi.reflecto.methods.ReflectoMethod;
-import com.cariochi.reflecto.parameters.ReflectoParameter;
 import com.cariochi.reflecto.types.ReflectoType;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -19,42 +18,54 @@ import static java.util.Comparator.comparingInt;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.IntStream.range;
-import static org.apache.commons.lang3.ClassUtils.isAssignable;
 
 @UtilityClass
 public class MethodsUtils {
 
-    public static Optional<ReflectoMethod> findMatchingMethod(List<ReflectoMethod> methods, String methodName, Class<?>... parameterTypes) {
+    public static Optional<ReflectoMethod> findMatchingMethod(List<ReflectoMethod> methods, String methodName, List<ReflectoType> argTypes) {
         return methods.stream()
-                .filter(m -> methodName.equals(m.name()) && isAssignable(parameterTypes, getActualParameterTypes(m), true))
-                .collect(groupingBy(m -> distance(parameterTypes, getActualParameterTypes(m)))).entrySet().stream()
+                .filter(method -> methodName.equals(method.name()) && isAssignable(argTypes, method.parameters().types()))
+                .collect(groupingBy(method -> distance(argTypes, method.parameters().types()))).entrySet().stream()
                 .min(comparingInt(Map.Entry::getKey))
                 .map(Map.Entry::getValue).stream()
                 .flatMap(List::stream)
                 .findFirst();
     }
 
-    private static Class<?>[] getActualParameterTypes(ReflectoMethod method) {
-        return method.parameters().stream().map(ReflectoParameter::type).map(ReflectoType::actualClass).toArray(Class[]::new);
-    }
 
-    private static int distance(Class<?>[] fromClassArray, Class<?>[] toClassArray) {
-        return range(0, fromClassArray.length)
+    private static int distance(List<ReflectoType> fromTypes, List<ReflectoType> toTypes) {
+        return range(0, fromTypes.size())
                 .map(i -> {
-                    final Class<?> fromClass = fromClassArray[i];
-                    final Class<?> toClass = toClassArray[i];
-                    return fromClass == null || fromClass.equals(toClass)
+                    final ReflectoType fromType = fromTypes.get(i);
+                    final ReflectoType toType = toTypes.get(i);
+                    return fromType == null || fromType.equals(toType)
                             ? 0
-                            : (isAssignable(fromClass, toClass, true) && !isAssignable(fromClass, toClass, false) ? 1 : 2);
+                            : (isAssignable(fromType, toType, true) && !isAssignable(fromType, toType, false) ? 1 : 2);
                 })
                 .sum();
+    }
+
+    private static boolean isAssignable(List<ReflectoType> fromTypes, List<ReflectoType> toTypes) {
+        if (fromTypes.size() != toTypes.size()) {
+            return false;
+        }
+        for (int i = 0; i < fromTypes.size(); i++) {
+            if (!isAssignable(fromTypes.get(i), toTypes.get(i), true)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static boolean isAssignable(ReflectoType fromType, ReflectoType toType, boolean autoboxing) {
+        return fromType.is(toType.actualType(), autoboxing);
     }
 
     public static List<ReflectoMethod> collectMethods(ReflectoType declaringType, boolean includeEnclosing) {
         final List<ReflectoMethod> methods = new ArrayList<>(collectMethods(declaringType).values());
         if (includeEnclosing) {
             Stream.of(declaringType.actualClass().getDeclaredFields())
-                    .map(field -> new ReflectoField(field, declaringType))
+                    .map(declaringType::reflect)
                     .map(MethodsUtils::getEnclosingMethods)
                     .flatMap(List::stream)
                     .forEach(methods::add);
@@ -67,7 +78,7 @@ public class MethodsUtils {
         final Map<MethodSignature, ReflectoMethod> thisMethods = Stream.of(type.actualClass().getDeclaredMethods())
                 .collect(toMap(
                         MethodSignature::new,
-                        m -> new ReflectoMethod(m, type),
+                        type::reflect,
                         (a, b) -> a,
                         LinkedHashMap::new
                 ));
@@ -105,7 +116,7 @@ public class MethodsUtils {
                 .forEach(enclosingMethods::add);
 
         Stream.of(syntheticField.type().actualClass().getDeclaredFields())
-                .map(field -> new ReflectoField(field, syntheticField.type()))
+                .map(syntheticField.type()::reflect)
                 .filter(ReflectoField::isSynthetic)
                 .peek(field -> field.syntheticParent(syntheticField))
                 .map(MethodsUtils::getEnclosingMethods)

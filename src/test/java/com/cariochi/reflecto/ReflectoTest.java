@@ -4,8 +4,6 @@ import com.cariochi.reflecto.fields.TargetField;
 import com.cariochi.reflecto.invocations.model.Reflection;
 import com.cariochi.reflecto.model.Bug;
 import com.cariochi.reflecto.model.User;
-import com.cariochi.reflecto.types.ReflectoType;
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 import static com.cariochi.reflecto.Reflecto.reflect;
@@ -85,7 +83,7 @@ class ReflectoTest {
         final Reflection reflection = reflect(bug);
         reflection.perform("setSummary(?)", "Modified bug");
         reflection.perform("getWatchers().get(?).setId(?)", 0, 1001);
-        reflection.reflect("getWatchers().get(?)", 0).methods().find("setUsername(?)", String.class).ifPresent(method -> method.invoke("java-dev"));
+        reflection.reflect("getWatchers().get(?)", 0).methods().get("setUsername(?)", String.class).invoke("java-dev");
         reflection.perform("getWatchers().remove(?)", 1);
         reflection.perform("getWatchers().add(?)", new User(1002, "pm"));
         reflection.perform("getTags()[?]=?", 0, "roles");
@@ -108,16 +106,14 @@ class ReflectoTest {
 
     @Test
     void should_get_java_field() {
-        final Optional<TargetField> reporter = reflect(bug()).reflect("reporter").fields().find("username");
+        final TargetField reporter = reflect(bug()).reflect("reporter").fields().get("username");
+
+        assertThat(reporter.type().actualType())
+            .isEqualTo(String.class);
 
         assertThat(reporter)
-                .map(TargetField::type)
-                .map(ReflectoType::actualType)
-                .contains(String.class);
-
-        assertThat(reporter)
-                .map(TargetField::getValue)
-                .contains("qa");
+            .extracting(TargetField::getValue)
+            .isEqualTo("qa");
     }
 
     @Test
@@ -126,6 +122,19 @@ class ReflectoTest {
         final Reflection reflection = reflect(bug);
         final String testInfo = reflection.perform("getTestInfo()");
         assertThat(testInfo).isEqualTo(bug.getTestInfo());
+    }
+
+    @Test
+    void should_get_declared() {
+      final Reflection reflection = reflect(bug());
+
+        // fields
+        assertThat(reflection.fields().list()).hasSize(6);
+        assertThat(reflection.declared().fields().list()).hasSize(1);
+
+        // methods
+        assertThat(reflection.methods().list()).hasSize(27);
+        assertThat(reflection.declared().methods().list()).hasSize(7);
     }
 
     void assertValueEquals(Reflection reflection, Object expected) {

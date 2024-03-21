@@ -1,74 +1,47 @@
 package com.cariochi.reflecto.proxy;
 
-import com.cariochi.reflecto.methods.ReflectoMethod;
-import com.cariochi.reflecto.methods.TargetMethod;
-import java.lang.reflect.Method;
-import java.util.Iterator;
-import java.util.List;
-import java.util.stream.Stream;
-import javassist.util.proxy.ProxyObject;
+import com.cariochi.reflecto.constructors.ReflectoConstructor;
+import com.cariochi.reflecto.types.ReflectoType;
+import java.lang.reflect.Constructor;
+import java.util.Arrays;
+import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
-import lombok.experimental.UtilityClass;
 
 import static com.cariochi.reflecto.Reflecto.reflect;
-import static java.util.stream.Collectors.toList;
+import static java.lang.String.format;
+import static org.apache.commons.lang3.reflect.ConstructorUtils.getMatchingAccessibleConstructor;
 
-@UtilityClass
+@RequiredArgsConstructor
 public class ProxyFactory {
 
-    @SneakyThrows
-    public static <T> T createInstance(MethodHandler methodHandler, Class<?>... types) {
-        final javassist.util.proxy.ProxyFactory factory = new javassist.util.proxy.ProxyFactory();
-        factory.setSuperclass(getSuperClass(types));
-        final List<Class<?>> interfaces = getInterfaces(types);
-        if (!interfaces.isEmpty()) {
-            factory.setInterfaces(interfaces.toArray(Class<?>[]::new));
-        }
-        final Class<?> proxyClass = factory.createClass();
-        final T proxyInstance = (T) proxyClass.newInstance();
-        ((ProxyObject) proxyInstance).setHandler(new ProxyMethodHandler(methodHandler));
-        return proxyInstance;
+    private final ReflectoType proxyType;
+    private final ReflectoType handlerType;
+    private final Supplier<? extends InvocationHandler> handlerSupplier;
 
-    }
+    public ProxyConstructor getConstructor(Class<?>... paramTypes) {
 
-    private static List<Class<?>> getInterfaces(Class<?>[] types) {
-        return Stream.of(types).filter(Class::isInterface).collect(toList());
-    }
-
-    private static Class<?> getSuperClass(Class<?>[] types) {
-        final List<Class<?>> superClasses = Stream.of(types).filter(t -> !t.isInterface()).collect(toList());
-        if (superClasses.size() > 1) {
-            throw new IllegalArgumentException("Single super class allowed");
-        }
-        final Iterator<Class<?>> iterator = superClasses.iterator();
-        return iterator.hasNext() ? iterator.next() : null;
-    }
-
-
-    public interface MethodHandler {
-
-        Object invoke(Object proxy, ReflectoMethod thisMethod, Object[] args, TargetMethod proceed) throws Throwable;
-
-    }
-
-    public interface MethodProceed {
-
-        Object proceed() throws Throwable;
-
-    }
-
-    @RequiredArgsConstructor
-    private static class ProxyMethodHandler implements javassist.util.proxy.MethodHandler {
-
-        private final MethodHandler handler;
-
-        @Override
-        public Object invoke(Object proxy, Method method, Method proceedMethod, Object[] args) throws Throwable {
-            final TargetMethod methodProceed = proceedMethod == null ? null : reflect(proceedMethod).withTarget(proxy);
-            return handler.invoke(proxy, reflect(method), args, methodProceed);
+        final Constructor<?> proxyTypeConstructor = getMatchingAccessibleConstructor(proxyType.actualClass(), paramTypes);
+        if (proxyTypeConstructor == null) {
+            throw new IllegalArgumentException(format(
+                    "Constructor of `%s` type with parameters %s not found",
+                    proxyType.superType().actualType().getTypeName(),
+                    Arrays.toString(paramTypes)
+            ));
         }
 
+        return new ProxyConstructor(proxyType, reflect(proxyTypeConstructor), handlerConstructor(paramTypes), handlerSupplier);
+    }
+
+    private ReflectoConstructor handlerConstructor(Class<?>[] paramTypes) {
+        if (handlerSupplier != null) {
+            return null;
+        }
+        return handlerType.declared().constructors().find(paramTypes)
+                .orElseThrow(() -> new IllegalArgumentException(format(
+                        "Constructor of `%s` type with parameters %s not found",
+                        handlerType.actualType().getTypeName(),
+                        Arrays.toString(paramTypes)
+                )));
     }
 
 }

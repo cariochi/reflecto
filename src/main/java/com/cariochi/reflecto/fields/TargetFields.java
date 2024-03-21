@@ -25,4 +25,7 @@ public class TargetFields implements Streamable<TargetField> {
                 .map(f -> f.withTarget(target));
     }
 
+    public TargetField get(String name) {
+        return fields.get(name).withTarget(target);
+    }
 }

@@ -21,7 +21,9 @@ public class ReflectoParameters implements Streamable<ReflectoParameter> {
 
     @Getter(lazy = true)
     private final List<ReflectoParameter> list = Stream.of(executable.getParameters())
-            .map(parameter -> new ReflectoParameter(parameter, declaringType))
+            .map(declaringType::reflect)
             .collect(toList());
 
+    @Getter(lazy = true)
+    private final List<ReflectoType> types = stream().map(ReflectoParameter::type).collect(toList());
 }

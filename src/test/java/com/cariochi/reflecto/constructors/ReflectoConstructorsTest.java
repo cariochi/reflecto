@@ -19,7 +19,7 @@ class ReflectoConstructorsTest {
 
         final ReflectoConstructors constructors = reflectoType.constructors();
         assertThat(constructors.list()).hasSize(3);
-        final ReflectoConstructor constructor = constructors.find(Collection.class).orElseThrow();
+        final ReflectoConstructor constructor = constructors.get(Collection.class);
         assertThat(constructor).isNotNull();
 
         assertThat(constructor.modifiers().isPublic()).isTrue();

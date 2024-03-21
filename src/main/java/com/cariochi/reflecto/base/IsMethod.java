@@ -14,9 +14,7 @@ public interface IsMethod {
         return rawMethod().getName();
     }
 
-    default ReflectoType returnType() {
-        return declaringType().reflect(rawMethod().getGenericReturnType());
-    }
+    ReflectoType returnType();
 
     default String toGenericString() {
         return rawMethod().toGenericString();
@@ -30,6 +28,10 @@ public interface IsMethod {
         return rawMethod().isDefault();
     }
 
+    default boolean isVarArgs() {
+        return rawMethod().isVarArgs();
+    }
+
     ReflectoAnnotations annotations();
 
     default ReflectoModifiers modifiers() {
@@ -40,9 +42,8 @@ public interface IsMethod {
         return new ReflectoParameters(rawMethod(), declaringType());
     }
 
-    default ReflectoExceptionTypes exceptions() {
-        return new ReflectoExceptionTypes(rawMethod(), declaringType());
+    default ReflectoExceptions exceptions() {
+        return new ReflectoExceptions(rawMethod(), declaringType());
     }
-
 
 }

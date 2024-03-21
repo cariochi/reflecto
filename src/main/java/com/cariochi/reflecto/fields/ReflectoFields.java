@@ -1,6 +1,7 @@
 package com.cariochi.reflecto.fields;
 
 import com.cariochi.reflecto.base.Streamable;
+import com.cariochi.reflecto.exceptions.NotFoundException;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -23,5 +24,9 @@ public class ReflectoFields implements Streamable<ReflectoField> {
                 .findFirst();
     }
 
+    public ReflectoField get(String name) {
+        return find(name)
+                .orElseThrow(() -> new NotFoundException("Field {0} not found", name));
+    }
 
 }

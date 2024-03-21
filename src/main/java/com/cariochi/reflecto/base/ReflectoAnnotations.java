@@ -1,5 +1,6 @@
 package com.cariochi.reflecto.base;
 
+import com.cariochi.reflecto.exceptions.NotFoundException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.util.List;
@@ -29,6 +30,11 @@ public class ReflectoAnnotations implements Streamable<Annotation> {
                 .filter(annotationClass::isInstance)
                 .map(annotationClass::cast)
                 .findFirst();
+    }
+
+    public <A extends Annotation> A get(Class<A> annotationClass) {
+        return find(annotationClass)
+            .orElseThrow(() -> new NotFoundException("Annotation {0} not found", annotationClass));
     }
 
     public <A extends Annotation> boolean contains(Class<A> annotationClass) {

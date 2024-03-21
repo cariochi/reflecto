@@ -18,7 +18,7 @@ public class FieldsUtils {
         ReflectoType current = declaringType;
         while (current != null) {
             for (Field field : current.actualClass().getDeclaredFields()) {
-                final ReflectoField reflectoField = new ReflectoField(field, current);
+                final ReflectoField reflectoField = current.reflect(field);
                 if (includeEnclosing && reflectoField.isSynthetic()) {
                     allFields.addAll(getEnclosingFields(reflectoField));
                 } else {
@@ -35,7 +35,7 @@ public class FieldsUtils {
         final ArrayList<ReflectoField> enclosingFields = new ArrayList<>();
 
         final List<ReflectoField> fields = Stream.of(syntheticField.type().actualClass().getDeclaredFields())
-                .map(field -> new ReflectoField(field, syntheticField.type()))
+                .map(syntheticField.type()::reflect)
                 .peek(field -> field.syntheticParent(syntheticField))
                 .collect(toList());
 

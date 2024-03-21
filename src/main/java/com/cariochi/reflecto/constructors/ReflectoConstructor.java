@@ -1,11 +1,12 @@
 package com.cariochi.reflecto.constructors;
 
 import com.cariochi.reflecto.base.ReflectoAnnotations;
-import com.cariochi.reflecto.base.ReflectoExceptionTypes;
+import com.cariochi.reflecto.base.ReflectoExceptions;
 import com.cariochi.reflecto.base.ReflectoModifiers;
 import com.cariochi.reflecto.parameters.ReflectoParameters;
 import com.cariochi.reflecto.types.ReflectoType;
 import java.lang.reflect.Constructor;
+import java.util.function.Supplier;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -17,52 +18,50 @@ import lombok.experimental.Accessors;
 @Accessors(fluent = true)
 public class ReflectoConstructor {
 
-    @EqualsAndHashCode.Include
-    private final Constructor<?> constructor;
-
     @Getter
-    private final ReflectoType declaringType;
+    @EqualsAndHashCode.Include
+    private final Constructor<?> rawConstructor;
+
+    private final Supplier<ReflectoType> declaringTypeSupplier;
 
     @Getter(lazy = true)
-    private final ReflectoAnnotations annotations = new ReflectoAnnotations(constructor);
+    private final ReflectoType declaringType = declaringTypeSupplier.get();
 
     @Getter(lazy = true)
-    private final ReflectoModifiers modifiers = new ReflectoModifiers(constructor.getModifiers());
+    private final ReflectoAnnotations annotations = new ReflectoAnnotations(rawConstructor);
 
     @Getter(lazy = true)
-    private final ReflectoParameters parameters = new ReflectoParameters(constructor, declaringType);
+    private final ReflectoModifiers modifiers = new ReflectoModifiers(rawConstructor.getModifiers());
 
     @Getter(lazy = true)
-    private final ReflectoExceptionTypes exceptions = new ReflectoExceptionTypes(constructor, declaringType);
+    private final ReflectoParameters parameters = new ReflectoParameters(rawConstructor, declaringType());
 
-
-    public Constructor<?> rawConstructor() {
-        return constructor;
-    }
+    @Getter(lazy = true)
+    private final ReflectoExceptions exceptions = new ReflectoExceptions(rawConstructor, declaringType());
 
     public String name() {
-        return constructor.getName();
+        return rawConstructor.getName();
     }
 
     @SneakyThrows
-    public <V> V newInstance(Object... initargs) {
-        final boolean accessible = constructor.isAccessible();
-        constructor.setAccessible(true);
-        final V result = (V) constructor.newInstance(initargs);
-        constructor.setAccessible(accessible);
+    public <V> V newInstance(Object... initArgs) {
+        final boolean accessible = rawConstructor.isAccessible();
+        rawConstructor.setAccessible(true);
+        final V result = (V) rawConstructor.newInstance(initArgs);
+        rawConstructor.setAccessible(accessible);
         return result;
     }
 
     public String toGenericString() {
-        return constructor.toGenericString();
+        return rawConstructor.toGenericString();
     }
 
     public boolean isVarArgs() {
-        return constructor.isVarArgs();
+        return rawConstructor.isVarArgs();
     }
 
     public boolean isSynthetic() {
-        return constructor.isSynthetic();
+        return rawConstructor.isSynthetic();
     }
 
 

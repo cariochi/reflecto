@@ -1,6 +1,8 @@
 package com.cariochi.reflecto.constructors;
 
 import com.cariochi.reflecto.base.Streamable;
+import com.cariochi.reflecto.exceptions.NotFoundException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -24,6 +26,11 @@ public class ReflectoConstructors implements Streamable<ReflectoConstructor> {
         } catch (NoSuchMethodException e) {
             return Optional.empty();
         }
+    }
+
+    public ReflectoConstructor get(Class<?>... parameterTypes) {
+        return find(parameterTypes)
+                .orElseThrow(() -> new NotFoundException("Constructor with parameters types {0} not found", Arrays.toString(parameterTypes)));
     }
 
     public interface ConstructorGetter {

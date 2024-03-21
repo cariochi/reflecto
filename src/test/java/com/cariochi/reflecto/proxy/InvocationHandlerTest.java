@@ -10,23 +10,23 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.joining;
 import static org.assertj.core.api.Assertions.assertThat;
 
-class InterfaceProxyFactoryTest {
+class InvocationHandlerTest {
 
     @Test
-    void should_create_proxy() {
-        final MyInterface instance = proxy(MyInterface.class)
+    void test() {
+        final MyAbstractClass instance = proxy(MyAbstractClass.class)
                 .with(MyProxyHandler::new)
-                .getConstructor()
-                .newInstance();
+                .getConstructor(int.class)
+                .newInstance(1);
 
-        assertThat(instance.toString()).startsWith("com.cariochi.reflecto.proxy.InterfaceProxyFactoryTest$MyInterface_$$");
+        assertThat(instance.toString()).startsWith("com.cariochi.reflecto.proxy.InvocationHandlerTest$MyAbstractClass_$$");
         assertThat(instance.hashCode()).isNotZero();
         assertThat(instance.equals(instance)).isTrue();
-        assertThat(instance.sayHello("Vadym")).isEqualTo("Hello Vadym");
+        assertThat(instance.sayHello("Vadym")).isEqualTo("You called sayHello(Vadym)");
         assertThat(instance.sayHello()).isEqualTo("Hello");
     }
 
-    public static class MyProxyHandler implements MyInterface, InvocationHandler {
+    public static class MyProxyHandler implements InvocationHandler {
 
         @Override
         public Object invoke(Object proxy, ReflectoMethod thisMethod, Object[] args, TargetMethod proceed) {
@@ -36,18 +36,17 @@ class InterfaceProxyFactoryTest {
             return format("You called %s(%s)", thisMethod.name(), Stream.of(args).map(String::valueOf).collect(joining(", ")));
         }
 
-        @Override
-        public String sayHello(String name) {
-            return "Hello " + name;
-        }
-
     }
 
-    private interface MyInterface {
-        String sayHello(String name);
-        default String sayHello() {
+    public abstract static class MyAbstractClass {
+
+        public MyAbstractClass(int foo) {
+        }
+
+        public abstract String sayHello(String name);
+
+        public String sayHello() {
             return "Hello";
         }
     }
-
 }

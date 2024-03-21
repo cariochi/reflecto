@@ -12,7 +12,7 @@ import static java.util.stream.Collectors.toList;
 
 @RequiredArgsConstructor
 @Accessors(fluent = true)
-public class ReflectoExceptionTypes implements Streamable<ReflectoType> {
+public class ReflectoExceptions implements Streamable<ReflectoType> {
 
     private final Executable executable;
     private final ReflectoType declaringType;

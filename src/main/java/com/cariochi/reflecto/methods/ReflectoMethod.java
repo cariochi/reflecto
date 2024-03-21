@@ -6,16 +6,19 @@ import com.cariochi.reflecto.fields.ReflectoField;
 import com.cariochi.reflecto.types.ReflectoType;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Supplier;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import static com.cariochi.reflecto.utils.TypesUtils.resolveTypeParameters;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 
@@ -28,7 +31,13 @@ public class ReflectoMethod implements IsMethod {
     @EqualsAndHashCode.Include
     private final Method rawMethod;
 
-    private final ReflectoType declaringType;
+    private final Supplier<ReflectoType> declaringTypeSupplier;
+
+    @Getter(lazy = true)
+    private final ReflectoType declaringType = declaringTypeSupplier.get();
+
+    @Getter(lazy = true)
+    private final ReflectoType returnType = determineReturnType();
 
     private final Set<ReflectoMethod> superMethods = new HashSet<>();
 
@@ -73,16 +82,21 @@ public class ReflectoMethod implements IsMethod {
         return annotations;
     }
 
-    public class Declared {
-
-        @Getter(lazy = true)
-        private final ReflectoAnnotations annotations = new ReflectoAnnotations(() ->  asList(rawMethod().getDeclaredAnnotations()));
-
-    }
-
     @Override
     public String toString() {
         return rawMethod.toString();
+    }
+
+    private ReflectoType determineReturnType() {
+        final Type type = resolveTypeParameters(rawMethod.getGenericReturnType(), rawMethod.getTypeParameters());
+        return declaringType().reflect(type);
+    }
+
+    public class Declared {
+
+        @Getter(lazy = true)
+        private final ReflectoAnnotations annotations = new ReflectoAnnotations(() -> asList(rawMethod().getDeclaredAnnotations()));
+
     }
 
 }

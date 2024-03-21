@@ -20,7 +20,7 @@ import static org.apache.commons.lang3.StringUtils.substringBefore;
 @Getter
 @EqualsAndHashCode
 @NoArgsConstructor(access = PRIVATE)
-class TypeName {
+public class TypeName {
 
     private static final Set<String> PRIMITIVE_TYPES = Set.of("byte", "short", "int", "long", "float", "double", "char", "boolean");
 
@@ -33,7 +33,7 @@ class TypeName {
 
     private final List<TypeName> arguments = new ArrayList<>();
 
-    public static TypeName of(Class<?> rawType, Type... typeArguments) {
+    public static TypeName of(Type rawType, Type... typeArguments) {
         final TypeName typeName = new TypeName();
         typeName.name = substringBefore(rawType.getTypeName(), "[");
         typeName.arguments.addAll(Stream.of(typeArguments)

@@ -22,6 +22,11 @@ public class TargetMethod implements IsMethod {
     }
 
     @Override
+    public ReflectoType returnType() {
+        return method.returnType();
+    }
+
+    @Override
     public Method rawMethod() {
         return method.rawMethod();
     }

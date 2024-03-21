@@ -19,8 +19,8 @@ class TargetFieldsTest {
     void should_get_field() {
         final Reflection reflect = reflect(bug());
         final List<TargetField> fields = List.of(
-                reflect.reflect("watchers[?]", 0).fields().find("username").orElseThrow(),
-                reflect.reflect("watchers[0]").fields().find("username").orElseThrow()
+                reflect.reflect("watchers[?]", 0).fields().get("username"),
+                reflect.reflect("watchers[0]").fields().get("username")
         );
         assertThat(fields)
                 .extracting(TargetField::name, TargetField::getValue)

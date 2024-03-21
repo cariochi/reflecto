@@ -17,8 +17,8 @@ class TargetMethodsTest {
     void should_get_method() {
         final Reflection reflection = reflect(bug());
         final List<TargetMethod> methods = List.of(
-                reflection.reflect("getWatchers()").reflect("get(?)", 0).methods().find("setUsername(?)", String.class).orElseThrow(),
-                reflection.reflect("getWatchers().get(?)", 0).methods().find("setUsername(?)", String.class).orElseThrow()
+                reflection.reflect("getWatchers()").reflect("get(?)", 0).methods().get("setUsername(?)", String.class),
+                reflection.reflect("getWatchers().get(?)", 0).methods().get("setUsername(?)", String.class)
         );
 
         assertThat(methods)
@@ -48,10 +48,13 @@ class TargetMethodsTest {
     @Test
     void should_invoke() {
         final Reflection reflection = reflect(bug());
+
         assertThat(reflection.<String>perform("reporter.sayHello(?)", "Vadym"))
                 .isEqualTo("Hello Vadym from qa");
-        assertThat(reflection.reflect("getReporter()").methods().find("sayHello(?)", String.class).map(method -> method.invoke("Vadym")))
-                .contains("Hello Vadym from qa");
+
+        assertThat(reflection.reflect("getReporter()").methods().get("sayHello(?)", String.class))
+                .extracting(method -> method.invoke("Vadym"))
+                .isEqualTo("Hello Vadym from qa");
     }
 
 }

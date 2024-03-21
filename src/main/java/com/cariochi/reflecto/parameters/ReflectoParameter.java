@@ -4,10 +4,14 @@ import com.cariochi.reflecto.base.ReflectoAnnotations;
 import com.cariochi.reflecto.base.ReflectoModifiers;
 import com.cariochi.reflecto.types.ReflectoType;
 import java.lang.reflect.Parameter;
+import java.lang.reflect.Type;
+import java.util.function.Supplier;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
+
+import static com.cariochi.reflecto.utils.TypesUtils.resolveTypeParameters;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @RequiredArgsConstructor
@@ -18,7 +22,10 @@ public class ReflectoParameter {
     @Getter
     private final Parameter rawParameter;
 
-    private final ReflectoType declaringType;
+    private final Supplier<ReflectoType> declaringTypeSupplier;
+
+    @Getter(lazy = true)
+    private final ReflectoType declaringType = declaringTypeSupplier.get();
 
     @Getter(lazy = true)
     private final ReflectoAnnotations annotations = new ReflectoAnnotations(rawParameter);
@@ -26,16 +33,15 @@ public class ReflectoParameter {
     @Getter(lazy = true)
     private final ReflectoModifiers modifiers = new ReflectoModifiers(rawParameter.getModifiers());
 
+    @Getter(lazy = true)
+    private final ReflectoType type = determineType();
+
     public boolean isNamePresent() {
         return rawParameter.isNamePresent();
     }
 
     public String name() {
         return rawParameter.getName();
-    }
-
-    public ReflectoType type() {
-        return declaringType.reflect(rawParameter.getParameterizedType());
     }
 
     public boolean isSynthetic() {
@@ -48,6 +54,11 @@ public class ReflectoParameter {
 
     public boolean isImplicit() {
         return rawParameter().isImplicit();
+    }
+
+    private ReflectoType determineType() {
+        final Type type = resolveTypeParameters(rawParameter.getParameterizedType(), rawParameter().getDeclaringExecutable().getTypeParameters());
+        return declaringType().reflect(type);
     }
 
 }

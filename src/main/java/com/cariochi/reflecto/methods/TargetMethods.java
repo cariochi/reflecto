@@ -1,6 +1,7 @@
 package com.cariochi.reflecto.methods;
 
 import com.cariochi.reflecto.base.Streamable;
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Optional;
 import lombok.Getter;
@@ -20,9 +21,12 @@ public class TargetMethods implements Streamable<TargetMethod> {
     @Getter(lazy = true)
     private final List<TargetMethod> list = methods.stream().map(m -> m.withTarget(target)).collect(toList());
 
-    public Optional<TargetMethod> find(String name, Class<?>... argClasses) {
-        return methods.find(name, argClasses)
+    public Optional<TargetMethod> find(String name, Type... argTypes) {
+        return methods.find(name, argTypes)
                 .map(m -> m.withTarget(target));
     }
 
+    public TargetMethod get(String name, Type... argTypes) {
+        return methods.get(name, argTypes).withTarget(target);
+    }
 }

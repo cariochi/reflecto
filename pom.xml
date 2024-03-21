@@ -7,7 +7,7 @@
 
     <groupId>com.cariochi.reflecto</groupId>
     <artifactId>reflecto</artifactId>
-    <version>1.2.0</version>
+    <version>1.2.1</version>
     <name>Reflecto</name>
     <description>Java Deep Reflection Library</description>
     <url>https://cariochi.com/reflecto</url>
@@ -41,10 +41,10 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <lombok.version>1.18.30</lombok.version>
         <commons-lang3.version>3.14.0</commons-lang3.version>
-        <jackson-databind.version>2.16.0</jackson-databind.version>
-        <assertj.version>3.24.2</assertj.version>
-        <junit-jupiter.version>5.10.1</junit-jupiter.version>
-        <javassist.version>3.30.0-GA</javassist.version>
+        <jackson-databind.version>2.16.1</jackson-databind.version>
+        <assertj.version>3.25.3</assertj.version>
+        <junit-jupiter.version>5.10.2</junit-jupiter.version>
+        <javassist.version>3.30.2-GA</javassist.version>
     </properties>
 
     <dependencies>

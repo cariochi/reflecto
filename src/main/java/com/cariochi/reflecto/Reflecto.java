@@ -6,7 +6,8 @@ import com.cariochi.reflecto.invocations.model.NullReflection;
 import com.cariochi.reflecto.invocations.model.Reflection;
 import com.cariochi.reflecto.methods.ReflectoMethod;
 import com.cariochi.reflecto.parameters.ReflectoParameter;
-import com.cariochi.reflecto.types.ReflectoObject;
+import com.cariochi.reflecto.proxy.ProxyType;
+import com.cariochi.reflecto.proxy.ReflectoProxy;
 import com.cariochi.reflecto.types.ReflectoType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -20,28 +21,32 @@ import static lombok.AccessLevel.PRIVATE;
 @RequiredArgsConstructor(access = PRIVATE)
 public class Reflecto {
 
-    public static Reflection reflect(Object instance) {
-        return instance == null ? new NullReflection() : new ReflectoObject(instance, reflect(instance.getClass()));
-    }
-
     public static ReflectoType reflect(Type type) {
         return new ReflectoType(type);
     }
 
+    public static Reflection reflect(Object instance) {
+        return instance == null ? new NullReflection() : reflect(instance.getClass()).reflect(instance);
+    }
+
     public static ReflectoField reflect(Field field) {
-        return new ReflectoField(field, reflect(field.getDeclaringClass()));
+        return reflect(field.getDeclaringClass()).reflect(field);
     }
 
     public static ReflectoMethod reflect(Method method) {
-        return new ReflectoMethod(method, reflect(method.getDeclaringClass()));
+        return reflect(method.getDeclaringClass()).reflect(method);
     }
 
     public static ReflectoParameter reflect(Parameter parameter) {
-        return new ReflectoParameter(parameter, reflect(parameter.getDeclaringExecutable().getDeclaringClass()));
+        return reflect(parameter.getDeclaringExecutable().getDeclaringClass()).reflect(parameter);
     }
 
-    public static ReflectoConstructor reflect(Constructor constructor) {
-        return new ReflectoConstructor(constructor, reflect(constructor.getDeclaringClass()));
+    public static ReflectoConstructor reflect(Constructor<?> constructor) {
+        return reflect(constructor.getDeclaringClass()).reflect(constructor);
+    }
+
+    public static ProxyType proxy(Type... types) {
+        return ReflectoProxy.createTypeProxy(types);
     }
 
 }

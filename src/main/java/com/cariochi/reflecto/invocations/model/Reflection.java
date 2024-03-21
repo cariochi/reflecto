@@ -34,6 +34,10 @@ public interface Reflection {
         return new TargetMethods(type().methods(), getValue());
     }
 
+    default Declared declared() {
+        return new Declared(this);
+    }
+
     default IncludeEnclosing includeEnclosing() {
         return new IncludeEnclosing(this);
     }
