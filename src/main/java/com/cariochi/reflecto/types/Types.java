@@ -1,13 +1,16 @@
 package com.cariochi.reflecto.types;
 
+import javassist.bytecode.SignatureAttribute.ClassSignature;
+import javassist.util.proxy.ProxyFactory;
+import lombok.experimental.UtilityClass;
+
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
-import javassist.bytecode.SignatureAttribute.ClassSignature;
-import javassist.util.proxy.ProxyFactory;
-import lombok.experimental.UtilityClass;
+import java.util.stream.Stream;
 
 import static com.cariochi.reflecto.utils.SignatureUtils.createClassSignature;
 
@@ -40,6 +43,14 @@ public class Types {
 
     public static Type arrayOf(Type type) {
         return Types.type(type.getTypeName() + "[]");
+    }
+
+    public static Type optionalOf(Type type) {
+        return Types.type(Optional.class, type);
+    }
+
+    public static Type streamOf(Type type) {
+        return Types.type(Stream.class, type);
     }
 
     public static Type type(Type rawType, Type... typeArguments) {

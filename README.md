@@ -3,15 +3,19 @@
 Java Deep Reflection Library
 
 ## Introduction
-Reflecto is a powerful Java Reflection Library designed to simplify deep reflection tasks. It enables developers to easily interact with Java types, constructors, methods, and fields through a clean and intuitive API.
+
+Reflecto is a powerful Java Reflection Library designed to simplify deep reflection tasks. It enables developers to
+easily interact with Java types, constructors, methods, and fields through a clean and intuitive API.
 
 ## Features
+
 - Type creation and inspection
 - Simplified access to constructors, methods, and fields
 - Advanced type checking and operations
 - Support for lists/arrays, maps, and method invocations
 
 ## Installation
+
 Include Reflecto in your project by adding it as a dependency in your build tool. For Maven:
 
 ```xml
@@ -75,6 +79,7 @@ Type complexTypeByName = Types.type("java.util.List<java.util.function.Supplier<
 ### Reflecting Types
 
 #### Inspecting Types
+
 ```java
 // Example class
 public static class Dto<T> {
@@ -112,6 +117,7 @@ assertThat(reflectoType.reflect("child.map[1][0].value").actualType()).isEqualTo
 ```
 
 #### Constructors
+
 ```java
 ReflectoType type = reflect(Types.type(ArrayList.class, String.class));
 
@@ -127,24 +133,26 @@ Object instance = constructor.newInstance(Set.of(1));
 ```
 
 #### Methods
+
 ```java
 // lists methods
 List<ReflectoMethod> methods = type.methods().list();
 List<ReflectoMethod> declaredMethods = type.declared().methods().list();
-List<ReflectoMethod> includeEnclosingMethods = type.includeEnclosing().methods().list();
 
 // find and invoke method
 ReflectoMethod method = type.methods().find("setUsername(?)", String.class).orElseThrow();
 TargetMethod targetMethod = method.withTarget(user);
-targetMethod.invoke("test_user");
+targetMethod.
+
+invoke("test_user");
 
 // filter methods
 List<ReflectoMethods> postProcessors = type.declared().methods().stream()
-    .filter(method -> method.modifiers().isPublic())
-    .filter(method -> method.annotations().contains(PostProcessor.class))
-    .filter(method -> method.returnType().is(void.class))
-    .filter(method -> method.parameters().size() == 1)
-    .collect(Collectors.toList());
+        .filter(method -> method.modifiers().isPublic())
+        .filter(method -> method.annotations().contains(PostProcessor.class))
+        .filter(method -> method.returnType().is(void.class))
+        .filter(method -> method.parameters().size() == 1)
+        .collect(Collectors.toList());
 
 // find and invoke a static method
 ReflectoMethod method = type.methods().find("sayHello(?)", String.class).orElseThrow();
@@ -153,11 +161,11 @@ String result = staticMethod.invoke("World");
 ```
 
 #### Fields
+
 ```java
 // list fields
 List<ReflectoField> fields = type.fields().list();
 List<ReflectoField> declaredFields = type.declared().fields().list();
-List<ReflectoField> includeEnclosingFields = type.includeEnclosing().fields().list();
 
 // find field
 ReflectoField field = type.fields().find("username").orElseThrow();
@@ -169,10 +177,10 @@ setValue("test_user");
 
 // filter fields
 List<ReflectoField> fields = type.declared().fields().stream()
-    .filter(field -> field.modifiers().isPrivate())
-    .filter(field -> field.annotations().contains(NotNull.class))
-    .filter(field -> field.type().is(String.class))
-    .collect(toList());
+        .filter(field -> field.modifiers().isPrivate())
+        .filter(field -> field.annotations().contains(NotNull.class))
+        .filter(field -> field.type().is(String.class))
+        .collect(toList());
 
 // find static field
 ReflectoField field = type.fields().find("NAME", String.class).orElseThrow();
@@ -184,10 +192,11 @@ setValue("New Name");
 ```
 
 #### Working with Arrays and Enums
+
 ```java
 ReflectoType arrayType = Reflecto.reflect(String[].class);
 boolean isArray = arrayType.isArray();
-ReflectoType componentType= asArray().componentType();
+ReflectoType componentType = asArray().componentType();
 
 ReflectoType enumType = Reflecto.reflect(MyEnum.class);
 boolean isEnum = enumTypee.isEnum();
@@ -195,6 +204,7 @@ List<Object> enumType = enumType.asEnum().constants();
 ```
 
 #### Methods for Type Checking
+
 ```java
 ReflectoType type = Reflecto.reflect(Types.listOf(String.class));
 
@@ -214,6 +224,7 @@ assertThat(type.isInstance(new ArrayList<>())).isTrue();
 ### Reflecting Objects
 
 #### Initial Object for Examples
+
 ```java
 Bug bug = Bug.builder()
         .id(1)
@@ -231,6 +242,7 @@ Bug bug = Bug.builder()
 ```
 
 #### Methods
+
 ```java
 List<TargetMethod> methods = Reflecto.reflect(bug).methods().list();
 
@@ -244,6 +256,7 @@ Reflecto.reflect(bug).methods().find("setReporter(?)", User.class)
 ```
 
 #### Fields
+
 ```java
 List<TargetField> fields = Reflecto.reflect(bug).fields().list();
 
@@ -257,6 +270,7 @@ Reflecto.reflect(bug).fields().find("reporter")
 ```
 
 #### Simple Field Access and Modification
+
 ```java
 // Getting Value
 
@@ -276,7 +290,9 @@ Reflecto.reflect(bug)
 Reflecto.reflect(bug)
         .invoke("reporter.username=?", "new_name");
 ```
+
 #### Working with Lists/Arrays
+
 ```java
 // Getting Value
 
@@ -312,6 +328,7 @@ Reflecto.reflect(bug)
 ```
 
 #### Working with Maps
+
 ```java
 // Getting Value
 
@@ -347,6 +364,7 @@ Reflecto.reflect(bug)
 ```
 
 #### Invoking Methods
+
 ```java
 String username = Reflecto.reflect(bug)
         .reflect("getWatchers().get(?).getUsername()", 0)
@@ -363,6 +381,7 @@ Reflecto.reflect(bug)
 ```
 
 #### Mixed Usage
+
 ```java
 String username = Reflecto.reflect(bug)
         .reflect("watchers[0].getUsername()")

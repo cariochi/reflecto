@@ -1,8 +1,10 @@
 package com.cariochi.reflecto.utils;
 
-import com.cariochi.reflecto.fields.ReflectoField;
 import com.cariochi.reflecto.methods.ReflectoMethod;
 import com.cariochi.reflecto.types.ReflectoType;
+import lombok.Value;
+import lombok.experimental.UtilityClass;
+
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -11,8 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
-import lombok.Value;
-import lombok.experimental.UtilityClass;
 
 import static java.util.Comparator.comparingInt;
 import static java.util.stream.Collectors.groupingBy;
@@ -61,19 +61,11 @@ public class MethodsUtils {
         return fromType.is(toType.actualType(), autoboxing);
     }
 
-    public static List<ReflectoMethod> collectMethods(ReflectoType declaringType, boolean includeEnclosing) {
-        final List<ReflectoMethod> methods = new ArrayList<>(collectMethods(declaringType).values());
-        if (includeEnclosing) {
-            Stream.of(declaringType.actualClass().getDeclaredFields())
-                    .map(declaringType::reflect)
-                    .map(MethodsUtils::getEnclosingMethods)
-                    .flatMap(List::stream)
-                    .forEach(methods::add);
-        }
-        return methods;
+    public static List<ReflectoMethod> collectMethods(ReflectoType declaringType) {
+        return new ArrayList<>(collectMethodsToMap(declaringType).values());
     }
 
-    private static Map<MethodSignature, ReflectoMethod> collectMethods(ReflectoType type) {
+    private static Map<MethodSignature, ReflectoMethod> collectMethodsToMap(ReflectoType type) {
 
         final Map<MethodSignature, ReflectoMethod> thisMethods = Stream.of(type.actualClass().getDeclaredMethods())
                 .collect(toMap(
@@ -84,12 +76,12 @@ public class MethodsUtils {
                 ));
 
         if (type.superType() != null) {
-            final Map<MethodSignature, ReflectoMethod> superMethods = collectMethods(type.superType());
+            final Map<MethodSignature, ReflectoMethod> superMethods = collectMethodsToMap(type.superType());
             mergeMethods(superMethods, thisMethods);
         }
 
         type.interfaces().forEach(superInterface -> {
-            final Map<MethodSignature, ReflectoMethod> superMethods = collectMethods(superInterface);
+            final Map<MethodSignature, ReflectoMethod> superMethods = collectMethodsToMap(superInterface);
             mergeMethods(superMethods, thisMethods);
 
         });
@@ -106,24 +98,6 @@ public class MethodsUtils {
                 thisMethod.addSuperMethod(m);
             }
         });
-    }
-
-    private static List<ReflectoMethod> getEnclosingMethods(ReflectoField syntheticField) {
-        final ArrayList<ReflectoMethod> enclosingMethods = new ArrayList<>();
-
-        syntheticField.type().methods().stream()
-                .peek(f -> f.syntheticParent(syntheticField))
-                .forEach(enclosingMethods::add);
-
-        Stream.of(syntheticField.type().actualClass().getDeclaredFields())
-                .map(syntheticField.type()::reflect)
-                .filter(ReflectoField::isSynthetic)
-                .peek(field -> field.syntheticParent(syntheticField))
-                .map(MethodsUtils::getEnclosingMethods)
-                .flatMap(List::stream)
-                .forEach(enclosingMethods::add);
-
-        return enclosingMethods;
     }
 
     @Value

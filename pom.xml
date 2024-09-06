@@ -7,7 +7,7 @@
 
     <groupId>com.cariochi.reflecto</groupId>
     <artifactId>reflecto</artifactId>
-    <version>1.2.1</version>
+    <version>1.2.2</version>
     <name>Reflecto</name>
     <description>Java Deep Reflection Library</description>
     <url>https://cariochi.com/reflecto</url>

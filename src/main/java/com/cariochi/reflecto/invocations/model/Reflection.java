@@ -4,10 +4,11 @@ import com.cariochi.reflecto.fields.TargetFields;
 import com.cariochi.reflecto.invocations.Invocations;
 import com.cariochi.reflecto.methods.TargetMethods;
 import com.cariochi.reflecto.types.ReflectoType;
-import java.util.List;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
+
+import java.util.List;
 
 public interface Reflection {
 
@@ -38,10 +39,6 @@ public interface Reflection {
         return new Declared(this);
     }
 
-    default IncludeEnclosing includeEnclosing() {
-        return new IncludeEnclosing(this);
-    }
-
     @RequiredArgsConstructor
     @Accessors(fluent = true)
     class Declared {
@@ -53,20 +50,6 @@ public interface Reflection {
 
         @Getter(lazy = true)
         private final TargetMethods methods = new TargetMethods(reflection.type().declared().methods(), reflection.getValue());
-
-    }
-
-    @RequiredArgsConstructor
-    @Accessors(fluent = true)
-    class IncludeEnclosing {
-
-        private final Reflection reflection;
-
-        @Getter(lazy = true)
-        private final TargetFields fields = new TargetFields(reflection.type().includeEnclosing().fields(), reflection.getValue());
-
-        @Getter(lazy = true)
-        private final TargetMethods methods = new TargetMethods(reflection.type().includeEnclosing().methods(), reflection.getValue());
 
     }
 

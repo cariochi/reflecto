@@ -2,13 +2,13 @@ package com.cariochi.reflecto.fields;
 
 import com.cariochi.reflecto.base.IsField;
 import com.cariochi.reflecto.types.ReflectoType;
-import java.lang.reflect.Field;
-import java.util.function.Supplier;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import java.lang.reflect.Field;
+import java.util.function.Supplier;
 
 import static java.lang.String.format;
 
@@ -26,15 +26,9 @@ public class ReflectoField implements IsField {
     @Getter(lazy = true)
     private final ReflectoType declaringType = declaringTypeSupplier.get();
 
-    @Setter
-    private ReflectoField syntheticParent;
-
     public TargetField withTarget(Object target) {
         if (modifiers().isStatic()) {
             return asStatic();
-        }
-        if (syntheticParent != null) {
-            target = syntheticParent.withTarget(target).getValue();
         }
         return new TargetField(target, this);
     }

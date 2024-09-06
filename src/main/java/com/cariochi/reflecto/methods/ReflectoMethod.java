@@ -2,8 +2,12 @@ package com.cariochi.reflecto.methods;
 
 import com.cariochi.reflecto.base.IsMethod;
 import com.cariochi.reflecto.base.ReflectoAnnotations;
-import com.cariochi.reflecto.fields.ReflectoField;
 import com.cariochi.reflecto.types.ReflectoType;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.Accessors;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -12,11 +16,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 
 import static com.cariochi.reflecto.utils.TypesUtils.resolveTypeParameters;
 import static java.lang.String.format;
@@ -44,15 +43,9 @@ public class ReflectoMethod implements IsMethod {
     @Getter
     private final Declared declared = new Declared();
 
-    @Setter
-    private ReflectoField syntheticParent;
-
     public TargetMethod withTarget(Object target) {
         if (modifiers().isStatic()) {
             return asStatic();
-        }
-        if (syntheticParent != null) {
-            target = syntheticParent.withTarget(target).getValue();
         }
         return new TargetMethod(target, this);
     }

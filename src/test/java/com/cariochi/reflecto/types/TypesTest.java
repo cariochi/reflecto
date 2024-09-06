@@ -1,20 +1,23 @@
 package com.cariochi.reflecto.types;
 
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 
 import static com.cariochi.reflecto.types.Types.any;
 import static com.cariochi.reflecto.types.Types.anyExtends;
 import static com.cariochi.reflecto.types.Types.anySuper;
 import static com.cariochi.reflecto.types.Types.arrayOf;
 import static com.cariochi.reflecto.types.Types.listOf;
+import static com.cariochi.reflecto.types.Types.optionalOf;
+import static com.cariochi.reflecto.types.Types.streamOf;
 import static com.cariochi.reflecto.types.Types.type;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
@@ -38,7 +41,9 @@ class TypesTest {
                 arguments("java.util.List<java.lang.String>[][]", type(List[][].class, String.class)),
                 arguments("java.util.List<?>", listOf(any())),
                 arguments("java.util.List<? extends java.lang.String>", listOf(anyExtends(String.class))),
-                arguments("java.util.List<? super java.lang.String>", listOf(anySuper(String.class)))
+                arguments("java.util.List<? super java.lang.String>", listOf(anySuper(String.class))),
+                arguments("java.util.Optional<? super java.lang.String>", optionalOf(anySuper(String.class))),
+                arguments("java.util.stream.Stream<? super java.lang.String>", streamOf(anySuper(String.class)))
         );
     }
 

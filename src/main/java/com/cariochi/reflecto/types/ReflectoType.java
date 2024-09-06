@@ -16,6 +16,12 @@ import com.cariochi.reflecto.parameters.ReflectoParameter;
 import com.cariochi.reflecto.utils.FieldsUtils;
 import com.cariochi.reflecto.utils.MethodsUtils;
 import com.cariochi.reflecto.utils.TypesUtils;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.Accessors;
+import org.apache.commons.lang3.reflect.TypeUtils;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
@@ -30,11 +36,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.Accessors;
-import org.apache.commons.lang3.reflect.TypeUtils;
 
 import static com.cariochi.reflecto.utils.ExpressionUtils.parseIndex;
 import static com.cariochi.reflecto.utils.ExpressionUtils.splitExpression;
@@ -60,15 +61,15 @@ public class ReflectoType {
     private final Class<?> actualClass = determineActualClass();
 
     @Getter(lazy = true)
-    private final ReflectoFields fields = new ReflectoFields(() -> FieldsUtils.collectFields(this, false));
+    private final ReflectoFields fields = new ReflectoFields(() -> FieldsUtils.collectFields(this));
 
     @Getter(lazy = true)
-    private final ReflectoMethods methods = new ReflectoMethods(this, () -> MethodsUtils.collectMethods(this, false));
+    private final ReflectoMethods methods = new ReflectoMethods(this, () -> MethodsUtils.collectMethods(this));
 
     @Getter(lazy = true)
     private final ReflectoConstructors constructors = new ReflectoConstructors(
-        () -> Stream.of(actualClass().getConstructors()).map(this::reflect).collect(toList()),
-        parameterTypes -> this.reflect(actualClass().getConstructor(parameterTypes))
+            () -> Stream.of(actualClass().getConstructors()).map(this::reflect).collect(toList()),
+            parameterTypes -> this.reflect(actualClass().getConstructor(parameterTypes))
     );
 
     @Getter(lazy = true)
@@ -82,9 +83,6 @@ public class ReflectoType {
 
     @Getter
     private final Declared declared = new Declared();
-
-    @Getter
-    private final IncludeEnclosing includeEnclosing = new IncludeEnclosing();
 
     public ReflectoType(Type type) {
         this(type, null);
@@ -101,7 +99,7 @@ public class ReflectoType {
         for (String exp : items) {
             reflectoType = exp.startsWith("[")
                     ? reflectoType.arguments().get(parseIndex(exp))
-                : reflectoType.fields().find(exp).map(IsField::type).orElseThrow(() -> new IllegalArgumentException(format("Field %s not found", exp)));
+                    : reflectoType.fields().find(exp).map(IsField::type).orElseThrow(() -> new IllegalArgumentException(format("Field %s not found", exp)));
         }
         return reflectoType;
     }
@@ -231,8 +229,8 @@ public class ReflectoType {
         }
 
         interfaces().stream()
-            .flatMap(i -> i.allInterfaces().stream())
-            .forEach(allInterfaces::add);
+                .flatMap(i -> i.allInterfaces().stream())
+                .forEach(allInterfaces::add);
 
         return allInterfaces;
     }
@@ -306,8 +304,8 @@ public class ReflectoType {
 
         public Optional<E> find(String name, boolean ignoreCase) {
             return stream()
-                .filter(e -> ignoreCase ? e.name().equalsIgnoreCase(name) : e.name().equals(name))
-                .findFirst();
+                    .filter(e -> ignoreCase ? e.name().equalsIgnoreCase(name) : e.name().equals(name))
+                    .findFirst();
         }
 
         public Object get(String name) {
@@ -316,7 +314,7 @@ public class ReflectoType {
 
         public Object get(String name, boolean ignoreCase) {
             return find(name, ignoreCase)
-                .orElseThrow(() -> new NotFoundException("Enum value {0} of {1} class not found", name, actualClass().getSimpleName()));
+                    .orElseThrow(() -> new NotFoundException("Enum value {0} of {1} class not found", name, actualClass().getSimpleName()));
         }
 
     }
@@ -325,39 +323,29 @@ public class ReflectoType {
 
         @Getter(lazy = true)
         private final ReflectoConstructors constructors = new ReflectoConstructors(
-            () -> Stream.of(actualClass().getDeclaredConstructors()).map(ReflectoType.this::reflect).collect(toList()),
-            parameterTypes -> ReflectoType.this.reflect(actualClass().getDeclaredConstructor(parameterTypes))
+                () -> Stream.of(actualClass().getDeclaredConstructors()).map(ReflectoType.this::reflect).collect(toList()),
+                parameterTypes -> ReflectoType.this.reflect(actualClass().getDeclaredConstructor(parameterTypes))
         );
 
 
         @Getter(lazy = true)
         private final ReflectoFields fields = new ReflectoFields(
                 () -> Stream.of(actualClass().getDeclaredFields())
-                    .map(ReflectoType.this::reflect)
+                        .map(ReflectoType.this::reflect)
                         .collect(toList())
         );
 
 
         @Getter(lazy = true)
         private final ReflectoMethods methods = new ReflectoMethods(
-            ReflectoType.this,
+                ReflectoType.this,
                 () -> Stream.of(actualClass().getDeclaredMethods())
-                    .map(ReflectoType.this::reflect)
+                        .map(ReflectoType.this::reflect)
                         .collect(toList())
         );
 
         @Getter(lazy = true)
         private final ReflectoAnnotations annotations = new ReflectoAnnotations(() -> asList(actualClass().getDeclaredAnnotations()));
-
-    }
-
-    public class IncludeEnclosing {
-
-        @Getter(lazy = true)
-        private final ReflectoFields fields = new ReflectoFields(() -> FieldsUtils.collectFields(ReflectoType.this, true));
-
-        @Getter(lazy = true)
-        private final ReflectoMethods methods = new ReflectoMethods(ReflectoType.this, () -> MethodsUtils.collectMethods(ReflectoType.this, true));
 
     }
 
@@ -368,9 +356,9 @@ public class ReflectoType {
 
     private ReflectoType findDeclaringClass(Class<?> declaringClass) {
         return Stream.of(Stream.of(this), allSuperTypes().stream(), allInterfaces().stream())
-            .flatMap(Function.identity())
-            .filter(type -> declaringClass.equals(type.actualClass()))
-            .findFirst()
-            .orElseGet(() -> reflect(declaringClass));
+                .flatMap(Function.identity())
+                .filter(type -> declaringClass.equals(type.actualClass()))
+                .findFirst()
+                .orElseGet(() -> reflect(declaringClass));
     }
 }
