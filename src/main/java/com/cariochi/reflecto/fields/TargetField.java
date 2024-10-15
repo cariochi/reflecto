@@ -14,10 +14,10 @@ import org.apache.commons.lang3.reflect.FieldUtils;
 
 @EqualsAndHashCode
 @RequiredArgsConstructor
+@Getter
 @Accessors(fluent = true)
 public class TargetField implements Reflection, IsField {
 
-    @Getter
     private final Object target;
 
     private final ReflectoField field;

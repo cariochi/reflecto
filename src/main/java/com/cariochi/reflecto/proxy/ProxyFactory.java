@@ -4,7 +4,9 @@ import com.cariochi.reflecto.constructors.ReflectoConstructor;
 import com.cariochi.reflecto.types.ReflectoType;
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.function.Supplier;
+import javassist.util.proxy.ProxyObject;
 import lombok.RequiredArgsConstructor;
 
 import static com.cariochi.reflecto.Reflecto.reflect;
@@ -17,6 +19,16 @@ public class ProxyFactory {
     private final ReflectoType proxyType;
     private final ReflectoType handlerType;
     private final Supplier<? extends InvocationHandler> handlerSupplier;
+
+    public static Optional<InvocationHandler> getHandler(Object proxy) {
+        return Optional.ofNullable(proxy)
+                .filter(ProxyObject.class::isInstance)
+                .map(ProxyObject.class::cast)
+                .map(javassist.util.proxy.ProxyFactory::getHandler)
+                .filter(MethodHandlerWrapper.class::isInstance)
+                .map(MethodHandlerWrapper.class::cast)
+                .map(MethodHandlerWrapper::getHandler);
+    }
 
     public ProxyConstructor getConstructor(Class<?>... paramTypes) {
 

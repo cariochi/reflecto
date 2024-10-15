@@ -7,14 +7,17 @@ import java.lang.reflect.Method;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import static com.cariochi.reflecto.Reflecto.reflect;
 
 @RequiredArgsConstructor
-class MethodHandlerWrapper implements javassist.util.proxy.MethodHandler {
+public class MethodHandlerWrapper implements javassist.util.proxy.MethodHandler {
 
     private final ReflectoType proxyType;
+
+    @Getter
     private final InvocationHandler handler;
 
     @Override

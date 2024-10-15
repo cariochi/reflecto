@@ -5,15 +5,20 @@ import com.cariochi.reflecto.base.ReflectoAnnotations;
 import com.cariochi.reflecto.types.ReflectoType;
 import java.lang.reflect.Method;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.experimental.Accessors;
 
 
+@Getter
+@Accessors(fluent = true)
 @EqualsAndHashCode
 @RequiredArgsConstructor
 public class TargetMethod implements IsMethod {
 
     private final Object target;
+
     private final ReflectoMethod method;
 
     @Override

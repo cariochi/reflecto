@@ -16,6 +16,7 @@ public class TargetMethods implements Streamable<TargetMethod> {
 
     private final ReflectoMethods methods;
 
+    @Getter
     private final Object target;
 
     @Getter(lazy = true)

@@ -15,6 +15,7 @@ public class TargetFields implements Streamable<TargetField> {
 
     private final ReflectoFields fields;
 
+    @Getter
     private final Object target;
 
     @Getter(lazy = true)
