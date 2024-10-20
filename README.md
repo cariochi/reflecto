@@ -152,7 +152,7 @@ List<ReflectoMethods> postProcessors = type.declared().methods().stream()
         .filter(method -> method.annotations().contains(PostProcessor.class))
         .filter(method -> method.returnType().is(void.class))
         .filter(method -> method.parameters().size() == 1)
-        .collect(Collectors.toList());
+        .toList();
 
 // find and invoke a static method
 ReflectoMethod method = type.methods().find("sayHello(?)", String.class).orElseThrow();
@@ -180,7 +180,7 @@ List<ReflectoField> fields = type.declared().fields().stream()
         .filter(field -> field.modifiers().isPrivate())
         .filter(field -> field.annotations().contains(NotNull.class))
         .filter(field -> field.type().is(String.class))
-        .collect(toList());
+        .toList();
 
 // find static field
 ReflectoField field = type.fields().find("NAME", String.class).orElseThrow();

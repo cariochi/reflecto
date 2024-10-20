@@ -1,10 +1,8 @@
 package com.cariochi.reflecto.utils;
 
+import com.cariochi.reflecto.base.IsMethod;
 import com.cariochi.reflecto.methods.ReflectoMethod;
 import com.cariochi.reflecto.types.ReflectoType;
-import lombok.Value;
-import lombok.experimental.UtilityClass;
-
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -13,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
+import lombok.Value;
+import lombok.experimental.UtilityClass;
 
 import static java.util.Comparator.comparingInt;
 import static java.util.stream.Collectors.groupingBy;
@@ -22,7 +22,7 @@ import static java.util.stream.IntStream.range;
 @UtilityClass
 public class MethodsUtils {
 
-    public static Optional<ReflectoMethod> findMatchingMethod(List<ReflectoMethod> methods, String methodName, List<ReflectoType> argTypes) {
+    public static <T extends IsMethod> Optional<T> findMatchingMethod(List<T> methods, String methodName, List<ReflectoType> argTypes) {
         return methods.stream()
                 .filter(method -> methodName.equals(method.name()) && isAssignable(argTypes, method.parameters().types()))
                 .collect(groupingBy(method -> distance(argTypes, method.parameters().types()))).entrySet().stream()

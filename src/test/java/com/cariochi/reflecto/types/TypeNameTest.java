@@ -28,7 +28,8 @@ class TypeNameTest {
                 arguments("java.util.Map$Entry<int[][], java.lang.String[]>", TypeName.of(Map.Entry.class, int[][].class, String[].class)),
                 arguments("java.util.List<java.util.Map<java.lang.String, java.lang.Integer>>", TypeName.of(List.class, Types.mapOf(String.class, Integer.class))),
                 arguments("int[][]", TypeName.of(int[][].class)),
-                arguments("java.util.Map$Entry<int[][], java.util.Map$Entry<java.lang.String[], byte[]>>", TypeName.of(Map.Entry.class, int[][].class, type(Map.Entry.class, String[].class, byte[].class))),
+                arguments("java.util.Map$Entry<int[][], java.util.Map$Entry<java.lang.String[], byte[]>>",
+                        TypeName.of(Map.Entry.class, int[][].class, type(Map.Entry.class, String[].class, byte[].class))),
                 arguments("java.util.List<java.lang.String>[][]", TypeName.of(List[][].class, String.class)),
                 arguments("java.util.List<? extends String>", TypeName.parse("java.util.List<? extends String>")),
                 arguments("java.util.List<T extends String>", TypeName.parse("java.util.List<T extends String>"))

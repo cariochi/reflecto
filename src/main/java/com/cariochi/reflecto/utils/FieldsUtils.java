@@ -2,11 +2,10 @@ package com.cariochi.reflecto.utils;
 
 import com.cariochi.reflecto.fields.ReflectoField;
 import com.cariochi.reflecto.types.ReflectoType;
-import lombok.experimental.UtilityClass;
-
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class FieldsUtils {

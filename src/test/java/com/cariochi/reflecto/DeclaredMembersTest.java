@@ -1,5 +1,8 @@
 package com.cariochi.reflecto;
 
+import com.cariochi.reflecto.constructors.ReflectoConstructor;
+import com.cariochi.reflecto.fields.ReflectoField;
+import com.cariochi.reflecto.methods.ReflectoMethod;
 import com.cariochi.reflecto.types.ReflectoType;
 import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
@@ -16,13 +19,22 @@ class DeclaredMembersTest {
         final ReflectoType type = reflect(type(MyList.class, String.class));
 
         assertThat(type.constructors()).hasSize(1);
-        assertThat(type.declared().constructors()).hasSize(2);
+        assertThat(type.constructors().declared().list())
+                .hasSize(2)
+                .extracting(ReflectoConstructor::declaringType)
+                .containsOnly(type);
 
         assertThat(type.fields()).hasSizeGreaterThan(1);
-        assertThat(type.declared().fields()).hasSize(1);
+        assertThat(type.fields().declared().list())
+                .hasSize(1)
+                .extracting(ReflectoField::declaringType)
+                .containsOnly(type);
 
         assertThat(type.methods()).hasSizeGreaterThan(1);
-        assertThat(type.declared().methods()).hasSize(1);
+        assertThat(type.methods().declared().list())
+                .hasSize(2)
+                .extracting(ReflectoMethod::declaringType)
+                .containsOnly(type);
     }
 
     @RequiredArgsConstructor
@@ -38,6 +50,10 @@ class DeclaredMembersTest {
             return "Hello " + name;
         }
 
+        @Override
+        public boolean add(T t) {
+            return super.add(t);
+        }
     }
 
 }

@@ -2,13 +2,12 @@ package com.cariochi.reflecto.fields;
 
 import com.cariochi.reflecto.base.IsField;
 import com.cariochi.reflecto.types.ReflectoType;
+import java.lang.reflect.Field;
+import java.util.function.Supplier;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
-
-import java.lang.reflect.Field;
-import java.util.function.Supplier;
 
 import static java.lang.String.format;
 

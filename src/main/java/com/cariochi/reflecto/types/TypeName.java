@@ -12,7 +12,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
 import static lombok.AccessLevel.PRIVATE;
 import static org.apache.commons.lang3.StringUtils.countMatches;
 import static org.apache.commons.lang3.StringUtils.substringBefore;
@@ -39,7 +38,7 @@ public class TypeName {
         typeName.arguments.addAll(Stream.of(typeArguments)
                 .map(TypeName::of)
                 .peek(a -> a.parent = typeName)
-                .collect(toList())
+                .toList()
         );
         typeName.dimension = countMatches(rawType.getTypeName(), "[");
         return typeName;

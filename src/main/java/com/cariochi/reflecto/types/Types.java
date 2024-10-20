@@ -1,9 +1,5 @@
 package com.cariochi.reflecto.types;
 
-import javassist.bytecode.SignatureAttribute.ClassSignature;
-import javassist.util.proxy.ProxyFactory;
-import lombok.experimental.UtilityClass;
-
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
@@ -11,6 +7,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
+import javassist.bytecode.SignatureAttribute.ClassSignature;
+import javassist.util.proxy.ProxyFactory;
+import lombok.experimental.UtilityClass;
 
 import static com.cariochi.reflecto.utils.SignatureUtils.createClassSignature;
 

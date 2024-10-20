@@ -48,7 +48,7 @@ public class ProxyFactory {
         if (handlerSupplier != null) {
             return null;
         }
-        return handlerType.declared().constructors().find(paramTypes)
+        return handlerType.constructors().declared().find(paramTypes)
                 .orElseThrow(() -> new IllegalArgumentException(format(
                         "Constructor of `%s` type with parameters %s not found",
                         handlerType.actualType().getTypeName(),

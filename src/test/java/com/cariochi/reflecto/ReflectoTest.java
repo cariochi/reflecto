@@ -109,11 +109,11 @@ class ReflectoTest {
         final TargetField reporter = reflect(bug()).reflect("reporter").fields().get("username");
 
         assertThat(reporter.type().actualType())
-            .isEqualTo(String.class);
+                .isEqualTo(String.class);
 
         assertThat(reporter)
-            .extracting(TargetField::getValue)
-            .isEqualTo("qa");
+                .extracting(TargetField::getValue)
+                .isEqualTo("qa");
     }
 
     @Test
@@ -126,15 +126,15 @@ class ReflectoTest {
 
     @Test
     void should_get_declared() {
-      final Reflection reflection = reflect(bug());
+        final Reflection reflection = reflect(bug());
 
         // fields
         assertThat(reflection.fields().list()).hasSize(6);
-        assertThat(reflection.declared().fields().list()).hasSize(1);
+        assertThat(reflection.fields().declared().list()).hasSize(1);
 
         // methods
         assertThat(reflection.methods().list()).hasSize(27);
-        assertThat(reflection.declared().methods().list()).hasSize(7);
+        assertThat(reflection.methods().declared().list()).hasSize(7);
     }
 
     void assertValueEquals(Reflection reflection, Object expected) {

@@ -14,13 +14,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.StreamSupport;
 
 import static com.cariochi.reflecto.utils.CollectionUtils.queueOf;
 import static java.lang.Integer.parseInt;
-import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.ClassUtils.toClass;
 import static org.apache.commons.lang3.StringUtils.substringBefore;
 
@@ -46,7 +44,8 @@ class Invocation {
             return type.methods().find(expression, toClass(args))
                     .map(matchingMethod -> matchingMethod.withTarget(instance))
                     .map(method -> new ReflectoObject(method.invoke(args), method.returnType())).stream()
-                    .collect(Collectors.toList());
+                    .map(Reflection.class::cast)
+                    .toList();
         }
 
         if (expression.equals("[*]")) {
@@ -130,7 +129,8 @@ class Invocation {
                         field.setValue(args[0]);
                     }
                 })
-                .collect(toList());
+                .map(Reflection.class::cast)
+                .toList();
     }
 
     private List<Reflection> getAllFromMap(Map<Object, Object> map, ReflectoType valueType) {
@@ -141,7 +141,8 @@ class Invocation {
                         field.setValue(args[0]);
                     }
                 })
-                .collect(toList());
+                .map(Reflection.class::cast)
+                .toList();
     }
 
     private List<Reflection> getAllFromList(List<Object> list, ReflectoType itemType) {
@@ -152,7 +153,8 @@ class Invocation {
                         field.setValue(args[0]);
                     }
                 })
-                .collect(toList());
+                .map(Reflection.class::cast)
+                .toList();
     }
 
     private List<Reflection> getAllFromSet(Set<Object> set, ReflectoType itemType) {
@@ -162,18 +164,20 @@ class Invocation {
             return IntStream.range(0, size)
                     .peek(i -> set.add(args[0]))
                     .mapToObj(i -> new ReflectoObject(args[0], itemType))
-                    .collect(toList());
+                    .map(Reflection.class::cast)
+                    .toList();
         } else {
             return set.stream()
                     .map(Reflecto::reflect)
-                    .collect(toList());
+                    .toList();
         }
     }
 
     private static List<Reflection> getAllFromIterable(Iterable<?> iterable, ReflectoType itemType) {
         return StreamSupport.stream(iterable.spliterator(), false)
                 .map(item -> new ReflectoObject(item, itemType))
-                .collect(toList());
+                .map(Reflection.class::cast)
+                .toList();
     }
 
 }

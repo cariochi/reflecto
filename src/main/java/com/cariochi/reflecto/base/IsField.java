@@ -2,6 +2,7 @@ package com.cariochi.reflecto.base;
 
 import com.cariochi.reflecto.types.ReflectoType;
 import java.lang.reflect.Field;
+import java.util.List;
 
 public interface IsField {
 
@@ -30,7 +31,10 @@ public interface IsField {
     }
 
     default ReflectoAnnotations annotations() {
-        return new ReflectoAnnotations(rawField());
+        return new ReflectoAnnotations(
+                () -> List.of(rawField().getAnnotations()),
+                () -> List.of(rawField().getDeclaredAnnotations())
+        );
     }
 
     default ReflectoModifiers modifiers() {

@@ -3,11 +3,6 @@ package com.cariochi.reflecto.methods;
 import com.cariochi.reflecto.base.IsMethod;
 import com.cariochi.reflecto.base.ReflectoAnnotations;
 import com.cariochi.reflecto.types.ReflectoType;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.Accessors;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -16,10 +11,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.Accessors;
 
 import static com.cariochi.reflecto.utils.TypesUtils.resolveTypeParameters;
 import static java.lang.String.format;
-import static java.util.Arrays.asList;
 
 @Getter
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -39,9 +37,6 @@ public class ReflectoMethod implements IsMethod {
     private final ReflectoType returnType = determineReturnType();
 
     private final Set<ReflectoMethod> superMethods = new HashSet<>();
-
-    @Getter
-    private final Declared declared = new Declared();
 
     public TargetMethod withTarget(Object target) {
         if (modifiers().isStatic()) {
@@ -63,14 +58,13 @@ public class ReflectoMethod implements IsMethod {
 
     @Override
     public ReflectoAnnotations annotations() {
-        return new ReflectoAnnotations(this::collectAnnotations);
+        return new ReflectoAnnotations(this::collectAnnotations, () -> List.of(rawMethod().getDeclaredAnnotations()));
     }
 
     private List<Annotation> collectAnnotations() {
-        final List<Annotation> annotations = new ArrayList<>();
-        annotations.addAll(asList(rawMethod().getDeclaredAnnotations()));
+        final List<Annotation> annotations = new ArrayList<>(List.of(rawMethod().getDeclaredAnnotations()));
         superMethods().stream()
-                .map(m -> m.collectAnnotations())
+                .map(ReflectoMethod::collectAnnotations)
                 .forEach(annotations::addAll);
         return annotations;
     }
@@ -83,13 +77,6 @@ public class ReflectoMethod implements IsMethod {
     private ReflectoType determineReturnType() {
         final Type type = resolveTypeParameters(rawMethod.getGenericReturnType(), rawMethod.getTypeParameters());
         return declaringType().reflect(type);
-    }
-
-    public class Declared {
-
-        @Getter(lazy = true)
-        private final ReflectoAnnotations annotations = new ReflectoAnnotations(() -> asList(rawMethod().getDeclaredAnnotations()));
-
     }
 
 }

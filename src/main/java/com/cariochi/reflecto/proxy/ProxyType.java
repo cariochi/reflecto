@@ -13,7 +13,6 @@ import lombok.experimental.Accessors;
 
 import static com.cariochi.reflecto.Reflecto.reflect;
 import static com.cariochi.reflecto.utils.SignatureUtils.createClassSignature;
-import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 
 @RequiredArgsConstructor
@@ -58,7 +57,7 @@ public class ProxyType {
                 .flatMap(List::stream)
                 .map(ReflectoType::actualType)
                 .map(TypeName::of)
-                .collect(toList());
+                .toList();
 
         return createClassSignature(superObjectType, interfaceTypes);
     }

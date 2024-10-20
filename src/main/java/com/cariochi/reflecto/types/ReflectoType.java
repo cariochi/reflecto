@@ -16,12 +16,6 @@ import com.cariochi.reflecto.parameters.ReflectoParameter;
 import com.cariochi.reflecto.utils.FieldsUtils;
 import com.cariochi.reflecto.utils.MethodsUtils;
 import com.cariochi.reflecto.utils.TypesUtils;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.Accessors;
-import org.apache.commons.lang3.reflect.TypeUtils;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
@@ -36,13 +30,16 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.Accessors;
+import org.apache.commons.lang3.reflect.TypeUtils;
 
 import static com.cariochi.reflecto.utils.ExpressionUtils.parseIndex;
 import static com.cariochi.reflecto.utils.ExpressionUtils.splitExpression;
 import static java.lang.String.format;
-import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.toList;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Accessors(fluent = true)
@@ -61,28 +58,37 @@ public class ReflectoType {
     private final Class<?> actualClass = determineActualClass();
 
     @Getter(lazy = true)
-    private final ReflectoFields fields = new ReflectoFields(() -> FieldsUtils.collectFields(this));
-
-    @Getter(lazy = true)
-    private final ReflectoMethods methods = new ReflectoMethods(this, () -> MethodsUtils.collectMethods(this));
-
-    @Getter(lazy = true)
-    private final ReflectoConstructors constructors = new ReflectoConstructors(
-            () -> Stream.of(actualClass().getConstructors()).map(this::reflect).collect(toList()),
-            parameterTypes -> this.reflect(actualClass().getConstructor(parameterTypes))
+    private final ReflectoFields fields = new ReflectoFields(
+            () -> FieldsUtils.collectFields(this),
+            () -> Stream.of(actualClass().getDeclaredFields()).map(ReflectoType.this::reflect).toList()
     );
 
     @Getter(lazy = true)
-    private final ReflectoAnnotations annotations = new ReflectoAnnotations(() -> asList(actualClass().getAnnotations()));
+    private final ReflectoMethods methods = new ReflectoMethods(
+            this,
+            () -> MethodsUtils.collectMethods(this),
+            () -> Stream.of(actualClass().getDeclaredMethods()).map(ReflectoType.this::reflect).toList()
+    );
+
+    @Getter(lazy = true)
+    private final ReflectoConstructors constructors = new ReflectoConstructors(
+            () -> Stream.of(this.actualClass().getConstructors()).map(this::reflect).toList(),
+            parameterTypes -> this.reflect(this.actualClass().getConstructor(parameterTypes)),
+            () -> Stream.of(this.actualClass().getDeclaredConstructors()).map(this::reflect).toList(),
+            parameterTypes -> this.reflect(this.actualClass().getDeclaredConstructor(parameterTypes))
+    );
+
+    @Getter(lazy = true)
+    private final ReflectoAnnotations annotations = new ReflectoAnnotations(
+            () -> List.of(actualClass().getAnnotations()),
+            () -> List.of(actualClass().getDeclaredAnnotations())
+    );
 
     @Getter(lazy = true)
     private final ReflectoModifiers modifiers = new ReflectoModifiers(actualClass().getModifiers());
 
     @Getter(lazy = true)
     private final TypeArguments arguments = new TypeArguments();
-
-    @Getter
-    private final Declared declared = new Declared();
 
     public ReflectoType(Type type) {
         this(type, null);
@@ -216,7 +222,7 @@ public class ReflectoType {
     public List<ReflectoType> interfaces() {
         return Stream.of(actualClass().getGenericInterfaces())
                 .map(this::reflect)
-                .collect(toList());
+                .toList();
     }
 
     public List<ReflectoType> allInterfaces() {
@@ -267,7 +273,7 @@ public class ReflectoType {
             final ParameterizedType parameterizedType = (ParameterizedType) actualType();
             return Stream.of(parameterizedType.getActualTypeArguments())
                     .map(t -> new ReflectoType(t, declaringType))
-                    .collect(toList());
+                    .toList();
         }
 
     }
@@ -295,7 +301,7 @@ public class ReflectoType {
 
         @Override
         public List<E> list() {
-            return (List<E>) asList(actualClass().getEnumConstants());
+            return (List<E>) List.of(actualClass().getEnumConstants());
         }
 
         public Optional<E> find(String name) {
@@ -316,36 +322,6 @@ public class ReflectoType {
             return find(name, ignoreCase)
                     .orElseThrow(() -> new NotFoundException("Enum value {0} of {1} class not found", name, actualClass().getSimpleName()));
         }
-
-    }
-
-    public class Declared {
-
-        @Getter(lazy = true)
-        private final ReflectoConstructors constructors = new ReflectoConstructors(
-                () -> Stream.of(actualClass().getDeclaredConstructors()).map(ReflectoType.this::reflect).collect(toList()),
-                parameterTypes -> ReflectoType.this.reflect(actualClass().getDeclaredConstructor(parameterTypes))
-        );
-
-
-        @Getter(lazy = true)
-        private final ReflectoFields fields = new ReflectoFields(
-                () -> Stream.of(actualClass().getDeclaredFields())
-                        .map(ReflectoType.this::reflect)
-                        .collect(toList())
-        );
-
-
-        @Getter(lazy = true)
-        private final ReflectoMethods methods = new ReflectoMethods(
-                ReflectoType.this,
-                () -> Stream.of(actualClass().getDeclaredMethods())
-                        .map(ReflectoType.this::reflect)
-                        .collect(toList())
-        );
-
-        @Getter(lazy = true)
-        private final ReflectoAnnotations annotations = new ReflectoAnnotations(() -> asList(actualClass().getDeclaredAnnotations()));
 
     }
 

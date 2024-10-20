@@ -7,7 +7,6 @@ import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 
 import static java.util.Arrays.stream;
-import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.substringBetween;
 
 @UtilityClass
@@ -25,7 +24,7 @@ public class ExpressionUtils {
         return stream(expression.split("\\."))
                 .flatMap(ExpressionUtils::splitByBrackets)
                 .map(StringUtils::trim)
-                .collect(toList());
+                .toList();
     }
 
     private static Stream<String> splitByBrackets(String s) {

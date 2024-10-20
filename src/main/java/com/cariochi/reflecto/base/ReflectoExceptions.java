@@ -8,8 +8,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 
-import static java.util.stream.Collectors.toList;
-
 @RequiredArgsConstructor
 @Accessors(fluent = true)
 public class ReflectoExceptions implements Streamable<ReflectoType> {
@@ -20,6 +18,6 @@ public class ReflectoExceptions implements Streamable<ReflectoType> {
     @Getter(lazy = true)
     private final List<ReflectoType> list = Stream.of(executable.getGenericExceptionTypes())
             .map(declaringType::reflect)
-            .collect(toList());
+            .toList();
 
 }

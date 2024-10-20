@@ -9,8 +9,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 
-import static java.util.stream.Collectors.toList;
-
 @RequiredArgsConstructor
 @Accessors(fluent = true)
 public class ReflectoParameters implements Streamable<ReflectoParameter> {
@@ -22,8 +20,8 @@ public class ReflectoParameters implements Streamable<ReflectoParameter> {
     @Getter(lazy = true)
     private final List<ReflectoParameter> list = Stream.of(executable.getParameters())
             .map(declaringType::reflect)
-            .collect(toList());
+            .toList();
 
     @Getter(lazy = true)
-    private final List<ReflectoType> types = stream().map(ReflectoParameter::type).collect(toList());
+    private final List<ReflectoType> types = stream().map(ReflectoParameter::type).toList();
 }

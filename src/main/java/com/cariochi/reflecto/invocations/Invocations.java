@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 
 import static com.cariochi.reflecto.utils.CollectionUtils.queueOf;
 import static com.cariochi.reflecto.utils.ExpressionUtils.splitExpression;
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
 import static lombok.AccessLevel.PRIVATE;
 import static org.apache.commons.lang3.StringUtils.countMatches;
@@ -27,9 +26,9 @@ public class Invocations {
         final List<Invocation> invocations = splitExpression(expression).stream()
                 .map(exp -> new Invocation(
                         substringBefore(exp, "=").trim(),
-                        range(0, countMatches(exp, '?')).mapToObj(i -> params.poll()).collect(toList()))
+                        range(0, countMatches(exp, '?')).mapToObj(i -> params.poll()).toList())
                 )
-                .collect(toList());
+                .toList();
         return new Invocations(invocations);
     }
 
@@ -40,7 +39,7 @@ public class Invocations {
             final Invocation nextInvocation = iterator.next();
             reflections = reflections.stream()
                     .flatMap(reflection -> nextInvocation.apply(reflection.getValue(), reflection.type()).stream())
-                    .collect(toList());
+                    .toList();
         }
         return reflections;
     }

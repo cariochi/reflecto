@@ -1,15 +1,14 @@
 package com.cariochi.reflecto.types;
 
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
-
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static com.cariochi.reflecto.types.Types.any;
 import static com.cariochi.reflecto.types.Types.anyExtends;
@@ -37,7 +36,8 @@ class TypesTest {
                 arguments("java.util.Map$Entry<int[][], java.lang.String[]>", type(Map.Entry.class, int[][].class, String[].class)),
                 arguments("java.util.List<java.util.Map<java.lang.String, java.lang.Integer>>", type(List.class, type(Map.class, String.class, Integer.class))),
                 arguments("int[][]", type(int[][].class)),
-                arguments("java.util.Map$Entry<int[][], java.util.Map$Entry<java.lang.String[], byte[]>>", type(Map.Entry.class, int[][].class, type(Map.Entry.class, String[].class, byte[].class))),
+                arguments("java.util.Map$Entry<int[][], java.util.Map$Entry<java.lang.String[], byte[]>>",
+                        type(Map.Entry.class, int[][].class, type(Map.Entry.class, String[].class, byte[].class))),
                 arguments("java.util.List<java.lang.String>[][]", type(List[][].class, String.class)),
                 arguments("java.util.List<?>", listOf(any())),
                 arguments("java.util.List<? extends java.lang.String>", listOf(anyExtends(String.class))),

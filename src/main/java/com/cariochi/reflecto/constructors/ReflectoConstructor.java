@@ -6,6 +6,7 @@ import com.cariochi.reflecto.base.ReflectoModifiers;
 import com.cariochi.reflecto.parameters.ReflectoParameters;
 import com.cariochi.reflecto.types.ReflectoType;
 import java.lang.reflect.Constructor;
+import java.util.List;
 import java.util.function.Supplier;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -28,7 +29,10 @@ public class ReflectoConstructor {
     private final ReflectoType declaringType = declaringTypeSupplier.get();
 
     @Getter(lazy = true)
-    private final ReflectoAnnotations annotations = new ReflectoAnnotations(rawConstructor);
+    private final ReflectoAnnotations annotations = new ReflectoAnnotations(
+            () -> List.of(rawConstructor.getAnnotations()),
+            () -> List.of(rawConstructor.getDeclaredAnnotations())
+    );
 
     @Getter(lazy = true)
     private final ReflectoModifiers modifiers = new ReflectoModifiers(rawConstructor.getModifiers());

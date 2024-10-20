@@ -8,8 +8,6 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.NotImplementedException;
 
-import static java.util.stream.Collectors.toList;
-
 @RequiredArgsConstructor
 public class CompositeReflection implements Reflection {
 
@@ -19,7 +17,7 @@ public class CompositeReflection implements Reflection {
     public <V> V getValue() {
         return (V) reflections.stream()
                 .map(Reflection::getValue)
-                .collect(toList());
+                .toList();
     }
 
     @Override
@@ -32,7 +30,7 @@ public class CompositeReflection implements Reflection {
         final Invocations invocations = Invocations.parse(expression, args);
         final List<Reflection> reflectionsList = reflections.stream()
                 .flatMap(reflection -> invocations.apply(reflection.getValue(), reflection.type()).stream())
-                .collect(toList());
+                .toList();
         return new CompositeReflection(reflectionsList);
     }
 

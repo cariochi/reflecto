@@ -25,18 +25,18 @@ public class TypesUtils {
         }
         if (type instanceof TypeVariable) {
             return Stream.of(typeParameters)
-                .filter(type::equals)
-                .findFirst()
-                .map(TypeUtils::getImplicitBounds)
-                .map(bounds -> bounds[0])
-                .orElse(type);
+                    .filter(type::equals)
+                    .findFirst()
+                    .map(TypeUtils::getImplicitBounds)
+                    .map(bounds -> bounds[0])
+                    .orElse(type);
         }
         if (type instanceof ParameterizedType) {
             final ParameterizedType parameterizedType = (ParameterizedType) type;
             final Type[] initialTypeArguments = parameterizedType.getActualTypeArguments();
             final Type[] resolvedTypeArguments = Stream.of(initialTypeArguments)
-                .map(ta -> resolveTypeParameters(ta, typeParameters))
-                .toArray(Type[]::new);
+                    .map(ta -> resolveTypeParameters(ta, typeParameters))
+                    .toArray(Type[]::new);
             return Arrays.equals(resolvedTypeArguments, initialTypeArguments) ? type : type(parameterizedType.getRawType(), resolvedTypeArguments);
         }
         if (type instanceof GenericArrayType) {

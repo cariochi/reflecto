@@ -27,7 +27,8 @@ class TypeReferenceTest {
                 arguments("java.util.Map$Entry<int[][], java.lang.String[]>", new TypeReference<Map.Entry<int[][], String[]>>() {}),
                 arguments("java.util.List<java.util.Map<java.lang.String, java.lang.Integer>>", new TypeReference<List<Map<String, Integer>>>() {}),
                 arguments("int[][]", new TypeReference<int[][]>() {}),
-                arguments("java.util.Map$Entry<int[][], java.util.Map$Entry<java.lang.String[], byte[]>>", new TypeReference<Map.Entry<int[][], Map.Entry<String[], byte[]>>>() {}),
+                arguments("java.util.Map$Entry<int[][], java.util.Map$Entry<java.lang.String[], byte[]>>",
+                        new TypeReference<Map.Entry<int[][], Map.Entry<String[], byte[]>>>() {}),
                 arguments("java.util.List<java.lang.String>[][]", new TypeReference<List<String>[][]>() {})
         );
     }
