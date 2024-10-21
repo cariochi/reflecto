@@ -7,33 +7,27 @@ import java.lang.reflect.Method;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
-
 
 @Getter
 @Accessors(fluent = true)
 @EqualsAndHashCode
 @RequiredArgsConstructor
-public class TargetMethod implements IsMethod {
-
-    private final Object target;
+public class ReflectoMethodInvocation implements IsMethod {
 
     private final ReflectoMethod method;
+    private final Object[] arguments;
 
-    @SuppressWarnings("unchecked")
-    @SneakyThrows
-    public <V> V invoke(Object... args) {
-        final Method rawMethod = rawMethod();
-        final boolean accessible = rawMethod.isAccessible();
-        rawMethod.setAccessible(true);
-        final V result = (V) rawMethod.invoke(target, args);
-        rawMethod.setAccessible(accessible);
-        return result;
+    public TargetMethodInvocation withTarget(Object target) {
+        if (modifiers().isStatic()) {
+            return new TargetMethodInvocation(method.asStatic(), arguments);
+        }
+        return new TargetMethodInvocation(method.withTarget(target), arguments);
     }
 
-    public TargetMethodInvocation withArguments(Object... args) {
-        return new TargetMethodInvocation(this, args);
+    @Override
+    public Method rawMethod() {
+        return method.rawMethod();
     }
 
     @Override
@@ -47,18 +41,7 @@ public class TargetMethod implements IsMethod {
     }
 
     @Override
-    public Method rawMethod() {
-        return method.rawMethod();
-    }
-
-    @Override
     public ReflectoAnnotations annotations() {
         return method.annotations();
     }
-
-    @Override
-    public String toString() {
-        return method.toString();
-    }
-
 }

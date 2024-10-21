@@ -45,6 +45,10 @@ public class ReflectoMethod implements IsMethod {
         return new TargetMethod(target, this);
     }
 
+    public ReflectoMethodInvocation withArguments(Object... args) {
+        return new ReflectoMethodInvocation(this, args);
+    }
+
     public TargetMethod asStatic() {
         if (!modifiers().isStatic()) {
             throw new IllegalArgumentException(format("Field %s is not static", name()));
