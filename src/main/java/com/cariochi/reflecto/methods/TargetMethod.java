@@ -21,15 +21,9 @@ public class TargetMethod implements IsMethod {
 
     private final ReflectoMethod method;
 
-    @SuppressWarnings("unchecked")
     @SneakyThrows
     public <V> V invoke(Object... args) {
-        final Method rawMethod = rawMethod();
-        final boolean accessible = rawMethod.isAccessible();
-        rawMethod.setAccessible(true);
-        final V result = (V) rawMethod.invoke(target, args);
-        rawMethod.setAccessible(accessible);
-        return result;
+        return withArguments(args).invoke();
     }
 
     public TargetMethodInvocation withArguments(Object... args) {

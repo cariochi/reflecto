@@ -47,13 +47,14 @@ public class ReflectoConstructor {
         return rawConstructor.getName();
     }
 
+
+    public ConstructorInvocation withArguments(Object... args) {
+        return new ConstructorInvocation(this, args);
+    }
+
     @SneakyThrows
-    public <V> V newInstance(Object... initArgs) {
-        final boolean accessible = rawConstructor.isAccessible();
-        rawConstructor.setAccessible(true);
-        final V result = (V) rawConstructor.newInstance(initArgs);
-        rawConstructor.setAccessible(accessible);
-        return result;
+    public <V> V newInstance(Object... args) {
+        return withArguments(args).newInstance();
     }
 
     public String toGenericString() {

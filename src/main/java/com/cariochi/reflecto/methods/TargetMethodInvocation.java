@@ -22,11 +22,11 @@ public class TargetMethodInvocation implements IsMethod {
     @SneakyThrows
     public <V> V invoke() {
         final Method rawMethod = rawMethod();
-        final boolean accessible = rawMethod.isAccessible();
+        final boolean accessible = rawMethod.canAccess(method.target());
         rawMethod.setAccessible(true);
-        final V result = (V) rawMethod.invoke(method.target(), arguments);
+        final Object result = rawMethod.invoke(method.target(), arguments);
         rawMethod.setAccessible(accessible);
-        return result;
+        return (V) result;
     }
 
     @Override
