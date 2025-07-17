@@ -58,6 +58,12 @@ public class ReflectoType {
     private final Class<?> actualClass = determineActualClass();
 
     @Getter(lazy = true)
+    private final ReflectoTypes types = new ReflectoTypes(
+            () -> Stream.of(actualClass().getClasses()).map(ReflectoType.this::reflect).toList(),
+            () -> Stream.of(actualClass().getDeclaredClasses()).map(ReflectoType.this::reflect).toList()
+    );
+
+    @Getter(lazy = true)
     private final ReflectoFields fields = new ReflectoFields(
             () -> FieldsUtils.collectFields(this),
             () -> Stream.of(actualClass().getDeclaredFields()).map(ReflectoType.this::reflect).toList()
