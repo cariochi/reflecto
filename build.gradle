@@ -1,0 +1,112 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    alias(libs.plugins.lombok)
+    id 'signing'
+    id "io.github.gradle-nexus.publish-plugin" version "2.0.0"
+}
+
+group = 'com.cariochi.reflecto'
+version = '2.0.2'
+description = 'Reflecto'
+java.sourceCompatibility = JavaVersion.VERSION_17
+
+repositories {
+    mavenLocal()
+    maven {
+        url = uri('https://repo.maven.apache.org/maven2/')
+    }
+}
+
+dependencies {
+
+    api libs.commons.lang3
+    api libs.javassist
+
+    compileOnly libs.lombok
+
+    testImplementation libs.jackson
+    testImplementation libs.assertj
+    testImplementation libs.junit.jupiter
+
+    testImplementation platform(libs.junit.bom)
+    testRuntimeOnly libs.junit.platform.launcher
+}
+
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
+tasks.test {
+    useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+        showStandardStreams = true
+    }
+}
+
+nexusPublishing {
+    repositories {
+        sonatype {
+            nexusUrl.set(uri("https://ossrh-staging-api.central.sonatype.com/service/local/"))
+            snapshotRepositoryUrl.set(uri("https://central.sonatype.com/repository/maven-snapshots/"))
+            username = findProperty("ossrhUsername")
+            password = findProperty("ossrhPassword")
+        }
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+
+            groupId = 'com.cariochi.reflecto'
+            artifactId = 'reflecto'
+            version = '2.0.2'
+
+            pom {
+                name = 'Reflecto'
+                description = 'Java Deep Reflection Library'
+                url = 'https://cariochi.com/reflecto'
+
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id = 'vdnk'
+                        name = 'Vadym Deineka'
+                        email = 'vadym@deineka.com'
+                        organization = 'cariochi.com'
+                        organizationUrl = 'https://cariochi.com'
+                    }
+                }
+
+                scm {
+                    connection = 'scm:git:https://github.com/cariochi/reflecto.git'
+                    developerConnection = 'scm:git:https://github.com/cariochi/reflecto.git'
+                    url = 'https://github.com/cariochi/reflecto.git'
+                }
+            }
+        }
+    }
+}
+
+signing {
+    useGpgCmd()
+    sign publishing.publications
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+tasks.withType(Javadoc) {
+    options.encoding = 'UTF-8'
+}

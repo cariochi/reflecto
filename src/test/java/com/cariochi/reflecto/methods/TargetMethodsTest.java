@@ -51,8 +51,16 @@ class TargetMethodsTest {
         assertThat(reflection.<String>perform("reporter.sayHello(?)", "Vadym"))
                 .isEqualTo("Hello Vadym from qa");
 
-        assertThat(reflection.reflect("getReporter()").methods().get("sayHello(?)", String.class))
+        final TargetMethod targetMethod = reflection.reflect("getReporter()").methods().get("sayHello(?)", String.class);
+
+        assertThat(targetMethod)
                 .extracting(method -> method.invoke("Vadym"))
+                .isEqualTo("Hello Vadym from qa");
+
+        final TargetMethodInvocation targetMethodInvocation = targetMethod.withArguments("Vadym");
+
+        assertThat(targetMethodInvocation)
+                .extracting(TargetMethodInvocation::invoke)
                 .isEqualTo("Hello Vadym from qa");
     }
 

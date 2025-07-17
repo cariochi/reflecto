@@ -3,6 +3,7 @@ package com.cariochi.reflecto.types;
 
 import com.cariochi.reflecto.exceptions.NotFoundException;
 import com.cariochi.reflecto.types.ReflectoType.EnumConstants;
+import com.cariochi.reflecto.types.ReflectoTypeTest.Super.Child;
 import java.lang.reflect.Type;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -47,12 +48,28 @@ class ReflectoTypeTest {
                 .hasMessage("Enum value NONE of MyEnum class not found");
     }
 
-    private static class Super<T> {
-        private T field;
+    @Test
+    void should_get_declared_types() {
+        final Type type = Types.type(Super.class, String.class);
+
+        assertThat(reflect(type).types().list())
+                .extracting(ReflectoType::actualType)
+                .containsExactly(Child.class);
+
+        assertThat(reflect(type).types().declared().list())
+                .extracting(ReflectoType::actualType)
+                .containsExactly(Child.class);
+
     }
 
-    private static class Child<T, K> extends Super<T> implements Interface<K> {
+    public static class Super<T> {
+        private T field;
+
+        public static class Child<T, K> extends Super<T> implements Interface<K> {
+        }
+
     }
+
 
     private interface Interface<K> {
     }

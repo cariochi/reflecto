@@ -10,24 +10,28 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 
-
 @Getter
 @Accessors(fluent = true)
 @EqualsAndHashCode
 @RequiredArgsConstructor
-public class TargetMethod implements IsMethod {
+public class TargetMethodInvocation implements IsMethod {
 
-    private final Object target;
-
-    private final ReflectoMethod method;
+    private final TargetMethod method;
+    private final Object[] arguments;
 
     @SneakyThrows
-    public <V> V invoke(Object... args) {
-        return withArguments(args).invoke();
+    public <V> V invoke() {
+        final Method rawMethod = rawMethod();
+        final boolean accessible = rawMethod.canAccess(method.target());
+        rawMethod.setAccessible(true);
+        final Object result = rawMethod.invoke(method.target(), arguments);
+        rawMethod.setAccessible(accessible);
+        return (V) result;
     }
 
-    public TargetMethodInvocation withArguments(Object... args) {
-        return new TargetMethodInvocation(this, args);
+    @Override
+    public Method rawMethod() {
+        return method.rawMethod();
     }
 
     @Override
@@ -41,18 +45,7 @@ public class TargetMethod implements IsMethod {
     }
 
     @Override
-    public Method rawMethod() {
-        return method.rawMethod();
-    }
-
-    @Override
     public ReflectoAnnotations annotations() {
         return method.annotations();
     }
-
-    @Override
-    public String toString() {
-        return method.toString();
-    }
-
 }
