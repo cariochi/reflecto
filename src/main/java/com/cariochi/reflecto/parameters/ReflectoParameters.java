@@ -9,6 +9,9 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 
+/**
+ * Streamable parameter collection for a method or constructor.
+ */
 @RequiredArgsConstructor
 @Accessors(fluent = true)
 public class ReflectoParameters implements Streamable<ReflectoParameter> {

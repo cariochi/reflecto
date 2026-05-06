@@ -1,13 +1,13 @@
 package com.cariochi.reflecto.model;
 
-import java.util.List;
-import java.util.Map;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import lombok.extern.jackson.Jacksonized;
+
+import java.util.List;
+import java.util.Map;
 
 import static lombok.AccessLevel.PRIVATE;
 
@@ -16,7 +16,6 @@ import static lombok.AccessLevel.PRIVATE;
 @Getter
 @Setter(PRIVATE)
 @SuperBuilder
-@Jacksonized
 public class Issue {
 
     @Id

@@ -14,6 +14,9 @@ import lombok.experimental.Accessors;
 
 import static com.cariochi.reflecto.utils.TypesUtils.resolveTypeParameters;
 
+/**
+ * Metadata wrapper around a Java {@link Parameter}.
+ */
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @RequiredArgsConstructor
 @Accessors(fluent = true)
@@ -40,22 +43,39 @@ public class ReflectoParameter {
     @Getter(lazy = true)
     private final ReflectoType type = determineType();
 
+    /**
+     * Checks whether the parameter name is present in bytecode.
+     *
+     * @return {@code true} when the parameter name is present in bytecode
+     */
     public boolean isNamePresent() {
         return rawParameter.isNamePresent();
     }
 
+    /**
+     * @return parameter name
+     */
     public String name() {
         return rawParameter.getName();
     }
 
+    /**
+     * @return {@code true} when the parameter is synthetic
+     */
     public boolean isSynthetic() {
         return rawParameter.isSynthetic();
     }
 
+    /**
+     * @return {@code true} when the parameter is a varargs parameter
+     */
     public boolean isVarArgs() {
         return rawParameter().isVarArgs();
     }
 
+    /**
+     * @return {@code true} when the parameter is implicitly declared
+     */
     public boolean isImplicit() {
         return rawParameter().isImplicit();
     }

@@ -45,7 +45,27 @@ class ReflectoTypeTest {
 
         assertThatThrownBy(() -> enumConstants.get("NONE"))
                 .isInstanceOf(NotFoundException.class)
-                .hasMessage("Enum value NONE of MyEnum class not found");
+                .hasMessage("Enum value NONE of com.cariochi.reflecto.types.ReflectoTypeTest$MyEnum not found. Available values: [FIRST, SECOND, THIRD]");
+    }
+
+    @Test
+    void should_report_missing_field_in_type_expression_with_context() {
+        assertThatThrownBy(() -> reflect(Super.class).reflect("missing"))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessageContaining("Field missing not found while resolving expression missing")
+                .hasMessageContaining(Super.class.getName())
+                .hasMessageContaining("field");
+    }
+
+    @Test
+    void should_report_invalid_type_view_with_context() {
+        assertThatThrownBy(() -> reflect(String.class).asArray())
+                .isInstanceOf(UnsupportedOperationException.class)
+                .hasMessage("Type java.lang.String is not an array");
+
+        assertThatThrownBy(() -> reflect(String.class).asEnum())
+                .isInstanceOf(UnsupportedOperationException.class)
+                .hasMessage("Type java.lang.String is not an enum");
     }
 
     @Test

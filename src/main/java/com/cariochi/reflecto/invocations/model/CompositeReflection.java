@@ -36,17 +36,17 @@ public class CompositeReflection implements Reflection {
 
     @Override
     public ReflectoType type() {
-        throw new NotImplementedException("Not supported for composite reflection");
+        throw new NotImplementedException("Composite reflection has no single type");
     }
 
     @Override
     public TargetFields fields() {
-        throw new NotImplementedException("Not supported for composite reflection");
+        throw new NotImplementedException("Composite reflection has no single field set");
     }
 
     @Override
     public TargetMethods methods() {
-        throw new NotImplementedException("Not supported for composite reflection");
+        throw new NotImplementedException("Composite reflection has no single method set");
     }
 
 }

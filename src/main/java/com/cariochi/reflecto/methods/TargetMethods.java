@@ -3,6 +3,9 @@ package com.cariochi.reflecto.methods;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 
+/**
+ * Target-bound method collection with a declared-only view.
+ */
 @Accessors(fluent = true)
 public class TargetMethods extends MethodsStreamable<TargetMethod> {
 

@@ -14,6 +14,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 
+/**
+ * Metadata wrapper around a Java {@link Constructor}.
+ */
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @RequiredArgsConstructor
 @Accessors(fluent = true)
@@ -43,28 +46,61 @@ public class ReflectoConstructor {
     @Getter(lazy = true)
     private final ReflectoExceptions exceptions = new ReflectoExceptions(rawConstructor, declaringType());
 
+    /**
+     * Returns the constructor name.
+     *
+     * @return constructor name
+     */
     public String name() {
         return rawConstructor.getName();
     }
 
 
+    /**
+     * Creates a constructor invocation with pre-bound arguments.
+     *
+     * @param args constructor arguments
+     * @return constructor invocation
+     */
     public ConstructorInvocation withArguments(Object... args) {
         return new ConstructorInvocation(this, args);
     }
 
+    /**
+     * Creates a new instance immediately.
+     *
+     * @param args constructor arguments
+     * @param <V> expected result type
+     * @return new instance
+     */
     @SneakyThrows
     public <V> V newInstance(Object... args) {
         return withArguments(args).newInstance();
     }
 
+    /**
+     * Returns the generic constructor signature.
+     *
+     * @return generic constructor signature
+     */
     public String toGenericString() {
         return rawConstructor.toGenericString();
     }
 
+    /**
+     * Checks whether the constructor accepts varargs.
+     *
+     * @return {@code true} when the constructor accepts varargs
+     */
     public boolean isVarArgs() {
         return rawConstructor.isVarArgs();
     }
 
+    /**
+     * Checks whether the constructor is synthetic.
+     *
+     * @return {@code true} when the constructor is synthetic
+     */
     public boolean isSynthetic() {
         return rawConstructor.isSynthetic();
     }

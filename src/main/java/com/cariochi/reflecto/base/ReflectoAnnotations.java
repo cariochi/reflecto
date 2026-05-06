@@ -6,6 +6,9 @@ import java.util.function.Supplier;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 
+/**
+ * Annotation collection with a declared-only view.
+ */
 @Accessors(fluent = true)
 public class ReflectoAnnotations extends AnnotationStreamable {
 

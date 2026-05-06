@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import static com.cariochi.reflecto.Reflecto.reflect;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class ReflectoMethodTest {
 
@@ -28,6 +29,16 @@ class ReflectoMethodTest {
         assertThat(methods.stream().filter(method -> method.annotations().declared().contains(Id.class))).isEmpty();
         assertThat(methods.stream().filter(method -> method.annotations().contains(Name.class))).isNotEmpty();
         assertThat(methods.stream().filter(method -> method.annotations().declared().contains(Name.class))).isNotEmpty();
+    }
+
+    @Test
+    void should_report_non_static_method_correctly() {
+        final Type type = Types.type(Child.class, String.class);
+        final ReflectoMethod method = reflect(type).methods().get("method()");
+
+        assertThatThrownBy(method::asStatic)
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Method method is not static");
     }
 
     private static class Parent<T> implements Interface<T>, Interface2<T> {

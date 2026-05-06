@@ -3,6 +3,9 @@ package com.cariochi.reflecto.fields;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 
+/**
+ * Target-bound field collection with a declared-only view.
+ */
 @Accessors(fluent = true)
 public class TargetFields extends FieldsStreamable<TargetField> {
 

@@ -25,7 +25,7 @@ public class ReflectoObject implements Reflection {
 
     @Override
     public <V> void setValue(V value) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Cannot set value on immutable reflection of type " + type.name());
     }
 
 }

@@ -5,6 +5,9 @@ import java.util.function.Supplier;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 
+/**
+ * Nested type collection with a declared-only view.
+ */
 @Accessors(fluent = true)
 public class ReflectoTypes extends TypesStreamable {
 

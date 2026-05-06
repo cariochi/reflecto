@@ -10,7 +10,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 
-
+/**
+ * Method reflection bound to a concrete target object, or to {@code null} for a
+ * static method.
+ */
 @Getter
 @Accessors(fluent = true)
 @EqualsAndHashCode
@@ -21,11 +24,24 @@ public class TargetMethod implements IsMethod {
 
     private final ReflectoMethod method;
 
+    /**
+     * Invokes the method immediately.
+     *
+     * @param args invocation arguments
+     * @param <V> expected result type
+     * @return invocation result
+     */
     @SneakyThrows
     public <V> V invoke(Object... args) {
         return withArguments(args).invoke();
     }
 
+    /**
+     * Creates an invocation with pre-bound arguments.
+     *
+     * @param args invocation arguments
+     * @return target method invocation
+     */
     public TargetMethodInvocation withArguments(Object... args) {
         return new TargetMethodInvocation(this, args);
     }

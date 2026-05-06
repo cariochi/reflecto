@@ -19,6 +19,12 @@ import lombok.experimental.Accessors;
 import static com.cariochi.reflecto.utils.TypesUtils.resolveTypeParameters;
 import static java.lang.String.format;
 
+/**
+ * Metadata wrapper around a Java {@link Method}.
+ * <p>
+ * Return types, parameters, annotations, exceptions, and inherited method
+ * metadata are resolved against the declaring {@link ReflectoType}.
+ */
 @Getter
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @RequiredArgsConstructor
@@ -38,6 +44,14 @@ public class ReflectoMethod implements IsMethod {
 
     private final Set<ReflectoMethod> superMethods = new HashSet<>();
 
+    /**
+     * Binds this method to a target instance.
+     * <p>
+     * Static methods ignore the supplied target and are bound as static methods.
+     *
+     * @param target object instance
+     * @return target-bound method
+     */
     public TargetMethod withTarget(Object target) {
         if (modifiers().isStatic()) {
             return asStatic();
@@ -45,21 +59,43 @@ public class ReflectoMethod implements IsMethod {
         return new TargetMethod(target, this);
     }
 
+    /**
+     * Creates a method invocation with pre-bound arguments.
+     *
+     * @param args invocation arguments
+     * @return method invocation
+     */
     public ReflectoMethodInvocation withArguments(Object... args) {
         return new ReflectoMethodInvocation(this, args);
     }
 
+    /**
+     * Binds this method as a static method.
+     *
+     * @return static target method
+     * @throws IllegalArgumentException when the method is not static
+     */
     public TargetMethod asStatic() {
         if (!modifiers().isStatic()) {
-            throw new IllegalArgumentException(format("Field %s is not static", name()));
+            throw new IllegalArgumentException(format("Method %s is not static", name()));
         }
         return new TargetMethod(null, this);
     }
 
+    /**
+     * Registers a method from a supertype so inherited annotations can be
+     * exposed together with the declared method annotations.
+     *
+     * @param method super method
+     */
     public void addSuperMethod(ReflectoMethod method) {
         superMethods.add(method);
     }
 
+    /**
+     * Returns method annotations, including annotations collected from matching
+     * super methods.
+     */
     @Override
     public ReflectoAnnotations annotations() {
         return new ReflectoAnnotations(this::collectAnnotations, () -> List.of(rawMethod().getDeclaredAnnotations()));

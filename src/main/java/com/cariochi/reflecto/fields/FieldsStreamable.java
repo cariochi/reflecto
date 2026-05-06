@@ -10,6 +10,13 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 
+import static com.cariochi.reflecto.utils.MessageUtils.fieldNames;
+
+/**
+ * Streamable field collection with name-based lookup helpers.
+ *
+ * @param <T> field wrapper type
+ */
 @RequiredArgsConstructor
 @Accessors(fluent = true)
 public class FieldsStreamable<T extends IsField> implements Streamable<T> {
@@ -19,14 +26,29 @@ public class FieldsStreamable<T extends IsField> implements Streamable<T> {
     @Getter(lazy = true)
     private final List<T> list = listSupplier.get();
 
+    /**
+     * Finds a field by name.
+     *
+     * @param name field name
+     * @return matching field, if present
+     */
     public Optional<T> find(String name) {
         return stream()
                 .filter(field -> name.equals(field.name()))
                 .findFirst();
     }
 
+    /**
+     * Returns a field by name.
+     *
+     * @param name field name
+     * @return matching field
+     * @throws NotFoundException when no field matches
+     */
     public T get(String name) {
         return find(name)
-                .orElseThrow(() -> new NotFoundException("Field {0} not found", name));
+                .orElseThrow(() -> new NotFoundException("Field {0} not found. Available fields: {1}",
+                        name,
+                        fieldNames(stream())));
     }
 }

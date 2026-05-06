@@ -6,6 +6,9 @@ import java.util.function.Supplier;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 
+/**
+ * Method metadata collection with a declared-only view.
+ */
 @Accessors(fluent = true)
 public class ReflectoMethods extends MethodsStreamable<ReflectoMethod> {
 

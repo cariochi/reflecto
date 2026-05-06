@@ -12,6 +12,10 @@ import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import org.apache.commons.lang3.reflect.FieldUtils;
 
+/**
+ * Field reflection bound to a concrete target object, or to {@code null} for a
+ * static field.
+ */
 @EqualsAndHashCode
 @RequiredArgsConstructor
 @Getter
@@ -22,6 +26,12 @@ public class TargetField implements Reflection, IsField {
 
     private final ReflectoField field;
 
+    /**
+     * Returns the resolved field type.
+     * <p>
+     * For type-variable fields on a target instance, the runtime target class is
+     * used as a fallback resolution context.
+     */
     @Override
     public ReflectoType type() {
         if (!field.type().isTypeVariable()) {
@@ -38,11 +48,23 @@ public class TargetField implements Reflection, IsField {
         return field.declaringType();
     }
 
+    /**
+     * Reads the field value, making the underlying field accessible when needed.
+     *
+     * @param <V> expected value type
+     * @return field value
+     */
     @SneakyThrows
     public <V> V getValue() {
         return (V) FieldUtils.readField(rawField(), target, true);
     }
 
+    /**
+     * Writes the field value, making the underlying field accessible when needed.
+     *
+     * @param value new value
+     * @param <V> value type
+     */
     @SneakyThrows
     public <V> void setValue(V value) {
         FieldUtils.writeField(rawField(), target, value, true);

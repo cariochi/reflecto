@@ -10,6 +10,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 
+/**
+ * Executable invocation with both a target method and arguments bound.
+ */
 @Getter
 @Accessors(fluent = true)
 @EqualsAndHashCode
@@ -19,6 +22,12 @@ public class TargetMethodInvocation implements IsMethod {
     private final TargetMethod method;
     private final Object[] arguments;
 
+    /**
+     * Invokes the underlying method, making it accessible when needed.
+     *
+     * @param <V> expected result type
+     * @return invocation result
+     */
     @SneakyThrows
     public <V> V invoke() {
         final Method rawMethod = rawMethod();

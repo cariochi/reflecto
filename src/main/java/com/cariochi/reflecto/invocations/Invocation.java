@@ -1,6 +1,7 @@
 package com.cariochi.reflecto.invocations;
 
 import com.cariochi.reflecto.Reflecto;
+import com.cariochi.reflecto.exceptions.NotFoundException;
 import com.cariochi.reflecto.fields.TargetField;
 import com.cariochi.reflecto.invocations.model.ArrayField;
 import com.cariochi.reflecto.invocations.model.ListField;
@@ -15,9 +16,11 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static com.cariochi.reflecto.utils.CollectionUtils.queueOf;
+import static com.cariochi.reflecto.utils.MessageUtils.typeNames;
 import static java.lang.Integer.parseInt;
 import static org.apache.commons.lang3.ClassUtils.toClass;
 import static org.apache.commons.lang3.StringUtils.substringBefore;
@@ -41,11 +44,18 @@ class Invocation {
         }
 
         if (isMethod) {
-            return type.methods().find(expression, toClass(args))
+            final Class<?>[] argTypes = toClass(args);
+            return type.methods().find(expression, argTypes)
                     .map(matchingMethod -> matchingMethod.withTarget(instance))
-                    .map(method -> new ReflectoObject(method.invoke(args), method.returnType())).stream()
+                    .map(method -> new ReflectoObject(method.invoke(args), method.returnType()))
                     .map(Reflection.class::cast)
-                    .toList();
+                    .map(List::of)
+                    .orElseThrow(() -> new NotFoundException(
+                            "Method {0} with argument types {1} not found while resolving expression {2} on type {3}",
+                            expression,
+                            typeNames(argTypes),
+                            expression,
+                            type.name()));
         }
 
         if (expression.equals("[*]")) {
@@ -65,18 +75,21 @@ class Invocation {
             Object key = ExpressionUtils.parseKey(expression);
             if ("?".equals(key)) {
                 key = argsQueue.poll();
+                if (key == null) {
+                    throw new IllegalArgumentException("Missing value for indexed expression " + expression);
+                }
             }
             if (type.isArray()) {
                 final ReflectoType itemType = type.asArray().componentType();
-                return new ArrayField((Object[]) instance, parseInt(key.toString()), itemType);
+                return new ArrayField((Object[]) instance, parseIndex(key), itemType);
             } else if (type.is(List.class)) {
                 final ReflectoType itemType = type.as(Iterable.class).arguments().get(0);
-                return new ListField((List<Object>) instance, parseInt(key.toString()), itemType);
+                return new ListField((List<Object>) instance, parseIndex(key), itemType);
             } else if (type.is(Map.class)) {
                 final ReflectoType valueType = type.as(Map.class).arguments().get(1);
                 return new MapField((Map<Object, Object>) instance, key, valueType);
             } else {
-                throw new IllegalArgumentException("Cannot access by index of " + type.actualType());
+                throw new IllegalArgumentException("Cannot access expression " + expression + " by index on type " + type.name());
             }
         } else {
             return type.fields().find(expression)
@@ -110,7 +123,7 @@ class Invocation {
 
         if (type.is(Iterable.class)) {
             if (args.length != 0) {
-                throw new IllegalArgumentException("Cannot modify object of " + type.actualType());
+                throw new IllegalArgumentException("Cannot assign through wildcard expression %s on read-only iterable type %s".formatted(expression, type.name()));
             } else {
                 final Iterable<?> iterable = (Iterable<?>) instance;
                 ReflectoType itemType = type.as(Iterable.class).arguments().get(0);
@@ -118,7 +131,15 @@ class Invocation {
             }
         }
 
-        throw new IllegalArgumentException("Cannot iterate " + type.actualType());
+        throw new IllegalArgumentException("Cannot iterate wildcard expression %s on type %s".formatted(expression, type.name()));
+    }
+
+    private static int parseIndex(Object key) {
+        try {
+            return parseInt(key.toString());
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Index must be an integer, but was " + key, e);
+        }
     }
 
     private List<Reflection> getAllFromArray(Object[] array, ReflectoType componentType) {

@@ -9,6 +9,9 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 
+/**
+ * Method invocation with arguments bound before the target is known.
+ */
 @Getter
 @Accessors(fluent = true)
 @EqualsAndHashCode
@@ -18,6 +21,12 @@ public class ReflectoMethodInvocation implements IsMethod {
     private final ReflectoMethod method;
     private final Object[] arguments;
 
+    /**
+     * Binds this invocation to a target object.
+     *
+     * @param target object instance
+     * @return executable target invocation
+     */
     public TargetMethodInvocation withTarget(Object target) {
         if (modifiers().isStatic()) {
             return new TargetMethodInvocation(method.asStatic(), arguments);

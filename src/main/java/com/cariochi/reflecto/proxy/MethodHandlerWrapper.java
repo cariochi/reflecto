@@ -27,7 +27,8 @@ public class MethodHandlerWrapper implements javassist.util.proxy.MethodHandler 
 
         final TargetMethod handlerMethodImpl = reflect(handler).methods().find(method.getName(), method.getParameterTypes()).orElse(null);
         if (handlerMethodImpl != null) {
-            final ReflectoType proxyDeclaringType = findDeclaringClass(proxyType, declaringClass).orElseThrow();
+            final ReflectoType proxyDeclaringType = findDeclaringClass(proxyType, declaringClass)
+                    .orElseThrow(() -> new IllegalStateException("Cannot resolve declaring type %s for proxy method %s".formatted(declaringClass.getName(), method)));
             final ReflectoType handlerDeclaringType = findDeclaringClass(reflect(handler.getClass()), declaringClass).orElse(null);
             if (proxyDeclaringType.equals(handlerDeclaringType)) {
                 if (proceed == null) {

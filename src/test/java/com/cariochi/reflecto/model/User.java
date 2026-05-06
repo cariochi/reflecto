@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.extern.jackson.Jacksonized;
 
 import static lombok.AccessLevel.PRIVATE;
 
@@ -16,7 +15,6 @@ import static lombok.AccessLevel.PRIVATE;
 @Getter
 @Setter(PRIVATE)
 @Builder
-@Jacksonized
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {

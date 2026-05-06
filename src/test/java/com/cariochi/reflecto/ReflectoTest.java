@@ -10,6 +10,7 @@ import static com.cariochi.reflecto.Reflecto.reflect;
 import static com.cariochi.reflecto.TestData.bug;
 import static com.cariochi.reflecto.TestData.modifiedBug;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class ReflectoTest {
 
@@ -122,6 +123,35 @@ class ReflectoTest {
         final Reflection reflection = reflect(bug);
         final String testInfo = reflection.perform("getTestInfo()");
         assertThat(testInfo).isEqualTo(bug.getTestInfo());
+    }
+
+    @Test
+    void should_report_missing_method_with_context() {
+        final Reflection reflection = reflect(bug());
+
+        assertThatThrownBy(() -> reflection.perform("missingMethod(?)", "value"))
+                .hasMessageContaining("Method missingMethod")
+                .hasMessageContaining("java.lang.String")
+                .hasMessageContaining(Bug.class.getName());
+    }
+
+    @Test
+    void should_report_missing_method_with_null_argument() {
+        final Reflection reflection = reflect(bug());
+
+        assertThatThrownBy(() -> reflection.perform("missingMethod(?)", (Object) null))
+                .hasMessageContaining("Method missingMethod")
+                .hasMessageContaining("[null]")
+                .hasMessageContaining(Bug.class.getName());
+    }
+
+    @Test
+    void should_report_invalid_index_with_context() {
+        final Reflection reflection = reflect(bug());
+
+        assertThatThrownBy(() -> reflection.perform("tags[invalid]"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Index must be an integer, but was invalid");
     }
 
     @Test

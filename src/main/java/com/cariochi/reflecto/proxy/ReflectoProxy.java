@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 
+import static com.cariochi.reflecto.utils.MessageUtils.typeNames;
+
 @UtilityClass
 public class ReflectoProxy {
 
@@ -23,7 +25,8 @@ public class ReflectoProxy {
                 .filter(type -> !type.actualClass().isInterface())
                 .toList();
         if (superClasses.size() > 1) {
-            throw new IllegalArgumentException("Single super class allowed");
+            throw new IllegalArgumentException("Only one superclass is allowed for a proxy. Provided superclasses: "
+                    + typeNames(superClasses.stream()));
         }
         final Iterator<ReflectoType> iterator = superClasses.iterator();
         return iterator.hasNext() ? iterator.next() : null;

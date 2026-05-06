@@ -15,6 +15,13 @@ import static com.cariochi.reflecto.Reflecto.reflect;
 import static com.cariochi.reflecto.utils.SignatureUtils.createClassSignature;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 
+/**
+ * Builder for a generated proxy type.
+ * <p>
+ * A proxy type may have one superclass and any number of interfaces. Generic
+ * signatures are preserved when parameterized {@link java.lang.reflect.Type}
+ * instances are used.
+ */
 @RequiredArgsConstructor
 @Accessors(fluent = true)
 public class ProxyType {
@@ -25,11 +32,27 @@ public class ProxyType {
     @Getter(lazy = true)
     private final ReflectoType type = createProxyType();
 
+    /**
+     * Uses an invocation handler class.
+     * <p>
+     * The handler class constructor must match the proxy constructor selected
+     * later with {@code getConstructor(...)} unless it has a no-argument
+     * constructor.
+     *
+     * @param handlerClass invocation handler implementation class
+     * @return proxy factory
+     */
     @SneakyThrows
     public ProxyFactory with(Class<? extends InvocationHandler> handlerClass) {
         return new ProxyFactory(type(), reflect(handlerClass), null);
     }
 
+    /**
+     * Uses an invocation handler supplier.
+     *
+     * @param handlerSupplier invocation handler supplier
+     * @return proxy factory
+     */
     @SneakyThrows
     public ProxyFactory with(Supplier<? extends InvocationHandler> handlerSupplier) {
         return new ProxyFactory(type(), null, handlerSupplier);

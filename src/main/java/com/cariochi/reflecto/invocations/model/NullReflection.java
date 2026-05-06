@@ -16,7 +16,7 @@ public class NullReflection implements Reflection {
 
     @Override
     public <V> void setValue(V value) {
-        throw new NullPointerException();
+        throw new NullPointerException("Cannot set value on null reflection");
     }
 
     @Override
