@@ -8,7 +8,7 @@ Reflecto is a Java reflection library focused on three tasks that are usually ve
 
 The library is designed for runtime tooling, framework code, metadata-heavy libraries, and internal infrastructure where native reflection APIs are correct but too low-level.
 
-## Features
+# Features
 
 - Unified `perform(...)` and `reflect(...)` API for fields, methods, arrays, lists, sets, maps, and nested object graphs
 - Generic-aware type utilities for `List<T>`, `Map<K, V>`, arrays, wildcards, `Optional<T>`, and `Stream<T>`
@@ -17,7 +17,7 @@ The library is designed for runtime tooling, framework code, metadata-heavy libr
 - Generic-aware proxy generation for abstract classes and interfaces
 - Detailed lookup failures via `NotFoundException`
 
-## Installation
+# Installation
 
 Reflecto requires Java 17 or newer.
 
@@ -29,7 +29,7 @@ Reflecto requires Java 17 or newer.
 </dependency>
 ```
 
-## Quick Start
+# Quick Start
 
 ```java
 import com.cariochi.reflecto.Reflecto;
@@ -66,7 +66,7 @@ reflection.perform("getWatchers().get(?).setId(?)", 1, 1002);
 reflection.perform("details[?]=?", "Sprint", "SPR-002");
 ```
 
-## Core Entry Points
+# Core Entry Points
 
 `Reflecto` exposes a small set of static entry points:
 
@@ -86,9 +86,9 @@ In practice:
 - use `Reflecto.reflect(type)` when you want metadata and generic type analysis
 - use `Reflecto.proxy(...)` when you want a runtime proxy class with preserved generic information
 
-## Working with Objects
+# Working with Objects
 
-### `perform(...)` vs `reflect(...)`
+## `perform(...)` vs `reflect(...)`
 
 `Reflection.perform(expression, args...)` executes an expression and returns the resulting value.
 
@@ -105,18 +105,18 @@ String username = reporter.perform("username");
 reporter.reflect("username").setValue("lead");
 ```
 
-### Expression Syntax
+## Expression Syntax
 
 Reflecto expressions are composed left to right and can mix fields, methods, collection access, and assignment.
 
-#### Field access
+### Field access
 
 ```java
 bug.perform("summary");
 bug.perform("reporter.username");
 ```
 
-#### Method invocation
+### Method invocation
 
 ```java
 bug.perform("getReporter()");
@@ -124,7 +124,7 @@ bug.perform("getReporter().getUsername()");
 bug.perform("setSummary(?)", "Updated summary");
 ```
 
-#### List and array indexing
+### List and array indexing
 
 ```java
 bug.perform("watchers[0].username");
@@ -134,7 +134,7 @@ bug.perform("watchers.get(?).username", 1);
 bug.perform("getTags()[?]=?", 0, "roles");
 ```
 
-#### Map access
+### Map access
 
 ```java
 bug.perform("details[Sprint]");
@@ -142,7 +142,7 @@ bug.perform("details[?]", "Sprint");
 bug.perform("getDetails().put(?,?)", "Sprint", "SPR-002");
 ```
 
-#### Assignment
+### Assignment
 
 Assignment is expressed by appending `=?` to the final segment.
 
@@ -153,7 +153,7 @@ bug.perform("watchers[0].id=?", 1001);
 bug.perform("details[?]=?", "Component", "Auth");
 ```
 
-#### Wildcard iteration with `[*]`
+### Wildcard iteration with `[*]`
 
 `[*]` applies an operation to every element in an array, `List`, `Set`, `Map`, or generic `Iterable`.
 
@@ -170,7 +170,7 @@ Wildcard reads return a flattened list of values:
 List<String> names = Reflecto.reflect(dto).perform("set[*].set[*].name");
 ```
 
-### Placeholder Arguments
+## Placeholder Arguments
 
 `?` placeholders are filled from `perform(...)` / `reflect(...)` arguments in encounter order.
 
@@ -179,7 +179,7 @@ bug.perform("watchers.get(?).username=?", 0, "java-dev");
 bug.perform("details[?]=?", "Sprint", "SPR-002");
 ```
 
-### Direct Member API on Objects
+## Direct Member API on Objects
 
 If you want explicit field or method handles instead of the expression language:
 
@@ -197,9 +197,9 @@ TargetMethod method = Reflecto.reflect(bugInstance)
 method.invoke("Updated again");
 ```
 
-## Working with Types
+# Working with Types
 
-### Creating Generic Types with `Types`
+## Creating Generic Types with `Types`
 
 `Types` is the builder API for `Type` objects.
 
@@ -224,7 +224,7 @@ Type nested = Types.type(List.class, Types.type(Map.class, String.class, Integer
 Type array = Types.arrayOf(Types.listOf(String.class));
 ```
 
-### Parsing Types from Strings
+## Parsing Types from Strings
 
 Reflecto can parse complex type declarations directly from strings and turn them into runtime `Type` instances.
 
@@ -234,7 +234,7 @@ Type wildcard = Types.type("java.util.List<? extends java.lang.Number>");
 Type array = Types.type("java.util.List<java.lang.String>[][]");
 ```
 
-### Inspecting Types with `ReflectoType`
+## Inspecting Types with `ReflectoType`
 
 ```java
 Type type = Types.type(List.class, String.class);
@@ -250,7 +250,7 @@ reflectoType.isArray();                                   // false
 reflectoType.isEnum();                                    // false
 ```
 
-#### Generic-aware type checks
+### Generic-aware type checks
 
 `ReflectoType.is(...)` and `ReflectoType.isAssignableFrom(...)` work with full generic type information, not only raw classes.
 
@@ -266,7 +266,7 @@ type.isAssignableFrom(Types.type(java.util.ArrayList.class, String.class)); // t
 type.isAssignableFrom(Types.type(java.util.ArrayList.class, Long.class));   // false
 ```
 
-#### Generic arguments
+### Generic arguments
 
 ```java
 ReflectoType listType = Reflecto.reflect(Types.listOf(String.class));
@@ -275,7 +275,7 @@ ReflectoType itemType = listType.arguments().get(0);
 assert itemType.actualType().equals(String.class);
 ```
 
-#### Resolving nested generic fields
+### Resolving nested generic fields
 
 `ReflectoType.reflect(expression)` resolves the type behind a nested path and keeps generic substitutions from the root type.
 
@@ -312,7 +312,7 @@ dto.reflect("map[1][0].value").actualType();  // Integer
 
 This is type navigation only. It does not read a map entry, list element, or array item from a runtime object.
 
-#### Arrays and enums
+### Arrays and enums
 
 Use `isArray()` / `asArray()` and `isEnum()` / `asEnum()` when you need array- or enum-specific behavior.
 
@@ -327,7 +327,7 @@ List<MyEnum> constants = enumType.asEnum().constants().list();
 MyEnum value = enumType.asEnum().constants().get("OPEN");
 ```
 
-#### Super types and interfaces
+### Super types and interfaces
 
 ```java
 ReflectoType type = Reflecto.reflect(ArrayList.class);
@@ -338,9 +338,9 @@ List<ReflectoType> directInterfaces = type.interfaces();
 List<ReflectoType> allInterfaces = type.allInterfaces();
 ```
 
-## Inspecting Members
+# Inspecting Members
 
-### Fields
+## Fields
 
 ```java
 ReflectoType type = Reflecto.reflect(MyClass.class);
@@ -360,7 +360,7 @@ String value = field.getValue();
 field.setValue("new value");
 ```
 
-### Methods
+## Methods
 
 Method lookup is overload-aware and uses the supplied argument types.
 
@@ -394,7 +394,7 @@ ReflectoMethod method = Reflecto.reflect(Util.class).methods().get("parse(?)", S
 Object value = method.asStatic().invoke("42");
 ```
 
-### Constructors
+## Constructors
 
 ```java
 ReflectoType type = Reflecto.reflect(ArrayList.class);
@@ -413,7 +413,7 @@ ctor.modifiers().isPublic();
 ctor.annotations().declared().list();
 ```
 
-### Declared vs inherited members
+## Declared vs inherited members
 
 For fields, methods, constructors, annotations, and nested types, Reflecto distinguishes between:
 
@@ -429,7 +429,7 @@ long allMethods = type.methods().size();
 long declaredMethods = type.methods().declared().size();
 ```
 
-## Proxies
+# Proxies
 
 Reflecto can generate a runtime proxy class for:
 
@@ -437,7 +437,7 @@ Reflecto can generate a runtime proxy class for:
 - zero or more interfaces
 - parameterized types, while preserving generic metadata on the generated class
 
-### Creating a proxy type
+## Creating a proxy type
 
 ```java
 ProxyType proxyType = Reflecto.proxy(
@@ -449,7 +449,7 @@ ProxyType proxyType = Reflecto.proxy(
 ReflectoType generatedType = proxyType.type();
 ```
 
-### Creating proxy instances
+## Creating proxy instances
 
 There are two ways to provide the invocation handler:
 
@@ -469,7 +469,7 @@ MyAbstractClass instance2 = Reflecto.proxy(MyAbstractClass.class)
         .newInstance(1);
 ```
 
-### Invocation handler contract
+## Invocation handler contract
 
 ```java
 public interface InvocationHandler {
@@ -488,13 +488,13 @@ public Object invoke(Object proxy, ReflectoMethod thisMethod, Object[] args, Tar
 }
 ```
 
-### Reading the handler from an existing proxy
+## Reading the handler from an existing proxy
 
 ```java
 Optional<InvocationHandler> handler = ProxyFactory.getHandler(proxyInstance);
 ```
 
-## Modifiers, Annotations, Parameters, Exceptions
+# Modifiers, Annotations, Parameters, Exceptions
 
 These helper APIs are available across fields, methods, constructors, and parameters:
 
@@ -513,7 +513,7 @@ List<ReflectoParameter> params = method.parameters().list();
 List<ReflectoType> thrown = method.exceptions().list();
 ```
 
-## Error Handling
+# Error Handling
 
 Lookup APIs throw `NotFoundException` with contextual messages when a member cannot be resolved.
 
@@ -538,7 +538,7 @@ Optional<ReflectoConstructor> ctor = Reflecto.reflect(MyClass.class)
 
 Invalid collection access produces `IllegalArgumentException`, for example when using a non-integer array/list index.
 
-## Notes and Practical Limits
+# Notes and Practical Limits
 
 - `perform(...)` is most useful for runtime tooling and infrastructure code. It is not a replacement for normal method calls in regular business code.
 - Method lookup is based on runtime argument types. When overload selection matters, prefer explicit APIs such as `methods().get(name, argTypes...)`.
@@ -546,6 +546,6 @@ Invalid collection access produces `IllegalArgumentException`, for example when 
 - `[*]` reads return flattened lists. `[*]` writes update every element in the traversed collection.
 - Direct writes through `set[*]=?` replace every value in the set with the provided value because positional assignment is not meaningful for sets.
 
-## License
+# License
 
 Reflecto is licensed under the [Apache License 2.0](LICENSE).
